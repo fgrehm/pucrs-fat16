@@ -1,17 +1,19 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string>
-
-void run_command(const std::string &cmd){
-
-  if (cmd == "exit"){
-    exit(0);
-  } 
-
-}
+#include "utils.h"
 
 std::string parse_command(const std::string& input) {
-  return input.substr(0, input.find(' '));
+  std::string cmd = trim(input);
+  return cmd.substr(0, cmd.find(' '));
+}
+
+void run_command(const std::string &cmd){
+  if (cmd == "exit"){
+    exit(0);
+  } else {
+    std::cout << "-> Will execute: " << parse_command(cmd) << std::endl;
+  }
 }
 
 int main() {
@@ -19,7 +21,7 @@ int main() {
   while (true) {
     std::cout << "$ ";
     std::string cmd;
-    getline (std::cin, cmd);
+    getline(std::cin, cmd);
     run_command(parse_command(cmd));
   }
   return 0;
