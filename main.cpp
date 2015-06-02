@@ -11,8 +11,10 @@ std::string parse_command(const std::string& input) {
 void run_command(const std::string &cmd){
   if (cmd == "exit"){
     exit(0);
+  } else if (cmd == "") {
+    std::cout << " => No command provided!" << std::endl;
   } else {
-    std::cout << "-> Will execute: " << parse_command(cmd) << std::endl;
+    std::cout << " => Will execute: " << parse_command(cmd) << std::endl;
   }
 }
 
