@@ -1,10 +1,9 @@
-
 .PHONY : all clean compile link 
 
 TESTAPPNAME=pucrs-fat16
 
-SRC= main.cpp
-OBJ= main.o 
+SRC= main.cpp utils.cpp
+OBJ= main.o  utils.o
 
 ARCH := $(shell getconf LONG_BIT)
 
