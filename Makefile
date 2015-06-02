@@ -2,8 +2,8 @@
 
 TESTAPPNAME=pucrs-fat16
 
-SRC= main.cpp utils.cpp
-OBJ= main.o  utils.o
+SRC= main.cpp utils.cpp console.cpp
+OBJ= main.o   utils.o   console.o
 
 ARCH := $(shell getconf LONG_BIT)
 

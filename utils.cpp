@@ -1,8 +1,7 @@
-//#include <iostream>
 #include <string>
-//#include <locale>
 
-// trim from both ends
+// Trim from both ends
+// Based on http://ideone.com/nFVtEo
 std::string trim(const std::string &s) {
   std::string::const_iterator it = s.begin();
   while (it != s.end() && isspace(*it))
