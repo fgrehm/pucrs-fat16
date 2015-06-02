@@ -1,4 +1,4 @@
-.PHONY : all clean compile link 
+.PHONY : all clean compile link
 
 TESTAPPNAME=pucrs-fat16
 
@@ -21,7 +21,7 @@ INTFLAGS = \
 	-fPIC \
 	-pthread
 POSTBUILD=
-#DEFINES= -D _DEBUG -D _LOG 
+#DEFINES= -D _DEBUG -D _LOG
 endif
 
 ifeq ($(MODE),release)
@@ -34,19 +34,19 @@ INTFLAGS = \
 	-fPIC \
 	-pthread
 POSTBUILD= strip $(TESTAPPNAME)
-#DEFINES= -D _LOG 
+#DEFINES= -D _LOG
 endif
 
 ifeq ($(ARCH),64)
 CPPFLAGS = $(INTFLAGS) -m64
-else 
+else
 CPPFLAGSS = $(INTFLAGS)
 endif
 
 INCLUDES=-I.
 LDFLAGS=
 
-all: compile link 
+all: compile link
 
 compile:
 	g++ -c $(INCLUDES) $(SRC) $(CPPFLAGS)
