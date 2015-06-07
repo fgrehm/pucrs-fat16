@@ -18,6 +18,7 @@ if __name__ == "__main__":
       if ord(b) != 0xbb:
         print("Boot block invalido no offset %d." % i)
         exit(1)
+    print("boot block: OK...")
 
     # testa integridade do header da FAT16
     b = f.read(2)
@@ -35,8 +36,8 @@ if __name__ == "__main__":
     if not(ord(b[0]) == 0xff and ord(b[1]) == 0xff):
       print("Header da FAT16 invalido: end of FAT16 invalido.")
       exit(1)
+    print("FAT header: OK...")
 
-    print("boot block valido")
 
-  print("FS virtual valido!")
+  print("Filesystem: OK!")
 
