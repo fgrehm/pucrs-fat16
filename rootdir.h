@@ -10,6 +10,8 @@ class RootDir {
     ~RootDir();
 
   private:
+    RootDir operator=(const RootDir&);
+    RootDir(const RootDir&);
 
 };
 
