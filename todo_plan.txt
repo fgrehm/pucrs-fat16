@@ -3,4 +3,5 @@ perguntas professor:
 * ta certa minha interpretaçao dos valores iniciais do FS virtual? (0xbb pra TODO o boot block, fffd,fffe e etc pros headers da FAT16 - serao fixos?)
 * oque exatamente vai ser considerado trapaça? manter todo o FS virtual em RAM?
 * oque é que se sugere manter em memoria? 3 blocos? mas em seguida a FAT sozinha é dita como tendo 8 blocos??
+* esta certa minha interpretação doque é o rootdir? é apenas 1 cluster (1024) bytes pra manter TODAS as definições de diretórios (de 32 bytes cada) ? ou da pra definir mais diretorios nos datablocks?
 
