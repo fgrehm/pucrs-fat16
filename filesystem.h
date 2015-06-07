@@ -40,6 +40,10 @@ class FileSystem {
 
   private:
 
+    Fat16 m_fat;
+    RootDir m_rootdir;
+    DataBlocks m_datablocks;
+
 };
 
 #endif // _FILESYSTEM_H_
