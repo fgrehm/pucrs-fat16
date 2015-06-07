@@ -1,0 +1,3 @@
+
+* perguntar professor: o boot block deve ter como header [0xff,  0xfd] e depois o resto do bloco todo com [0xbb]?
+
