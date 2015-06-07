@@ -1,7 +1,7 @@
 
 #include "filesystem.h"
 
-FileSystem::FileSystem(){
+FileSystem::FileSystem():m_workingdir("/"){
 }
 
 FileSystem::~FileSystem(){
