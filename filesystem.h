@@ -9,6 +9,10 @@ class FileSystem {
     FileSystem();
     ~FileSystem();
 
+    /* Filesystem interface begin */
+    void format();
+    /* Filesystem interface end */
+
   private:
 
 };

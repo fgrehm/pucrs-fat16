@@ -7,6 +7,7 @@ perguntas professor:
 * oque é que se sugere manter em memoria? 3 blocos? mas em seguida a FAT sozinha é dita como tendo 8 blocos??
 * esta certa minha interpretação doque é o rootdir? é apenas 1 cluster (1024) bytes pra manter TODAS as definições de diretórios (de 32 bytes cada) ? ou da pra definir mais diretorios nos datablocks?
 * como deve ser feito um "mkdir /home/trab/sisop/" ? desmontar o path e ir catando dentro do RootDir?
+* tentar confirmar com o professor: oque na pratica vamos fazer com o fffd (boot) e fffe(fat)? e o ffff(eof) vamos usar pra marcar na FAT conforme vamos populando-a certo?
 
 // FGTODO
 
