@@ -3,10 +3,10 @@
 
 #define FAT16_ENTRIES 4096
 
-#define FREE_ENTRY "\x00\x00"
-#define BOOT_ENTRY "\xff\xfd"
-#define FAT_ENTRY  "\xff\xfe"
-#define EOF_ENTRY  "\xff\xff"
+#define FREE_ENTRY 0x0000
+#define BOOT_ENTRY 0xfffd
+#define FAT_ENTRY  0xfffe
+#define EOF_ENTRY  0xffff
 
 Fat16::Fat16():m_fat16(0){
   m_fat16 = new unsigned short[FAT16_ENTRIES];

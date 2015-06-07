@@ -8,6 +8,7 @@ perguntas professor:
 * esta certa minha interpretação doque é o rootdir? é apenas 1 cluster (1024) bytes pra manter TODAS as definições de diretórios (de 32 bytes cada) ? ou da pra definir mais diretorios nos datablocks?
 * como deve ser feito um "mkdir /home/trab/sisop/" ? desmontar o path e ir catando dentro do RootDir?
 * tentar confirmar com o professor: oque na pratica vamos fazer com o fffd (boot) e fffe(fat)? e o ffff(eof) vamos usar pra marcar na FAT conforme vamos populando-a certo?
+* o enunciado diz "Deve-se ler e escrever sempre utilizando a unidade cluster, independente de ser a FAT, diretorio ou bloco de dados de arquivo" -> oque isto quer dizer exatamente?
 
 // FGTODO
 
