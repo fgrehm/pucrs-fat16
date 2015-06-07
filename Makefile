@@ -2,8 +2,8 @@
 
 TESTAPPNAME=pucrs-fat16
 
-SRC= main.cpp utils.cpp console.cpp filesystem.cpp fat16.cpp rootdir.cpp dir.cpp datablocks.cpp
-OBJ= main.o   utils.o   console.o   filesystem.o   fat16.o   rootdir.o   dir.o   datablocks.o
+SRC= main.cpp utils.cpp console.cpp filesystem.cpp fat16.cpp rootdir.cpp dir.cpp datablocks.cpp block.cpp
+OBJ= main.o   utils.o   console.o   filesystem.o   fat16.o   rootdir.o   dir.o   datablocks.o   block.o
 
 ARCH := $(shell getconf LONG_BIT)
 
