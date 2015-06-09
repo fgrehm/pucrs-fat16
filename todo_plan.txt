@@ -10,5 +10,25 @@ perguntas professor:
 * tentar confirmar com o professor: oque na pratica vamos fazer com o fffd (boot) e fffe(fat)? e o ffff(eof) vamos usar pra marcar na FAT conforme vamos populando-a certo?
 * o enunciado diz "Deve-se ler e escrever sempre utilizando a unidade cluster, independente de ser a FAT, diretorio ou bloco de dados de arquivo" -> oque isto quer dizer exatamente?
 
+respostas professor:
+* o rootdir eh so pra indicar os niveis embaixo do /
+/home por exemplo, o proprio home itself vai nos datablocks.
+
+* e sim, precisamos montar uma arvore pra percorrer os paths
+* so pode deixar a FAT na RAM! pode dumpear a FAT, mas tem que fseek() no resto da particao pra escrever os datablocks
+
+"mkdir /home" eh assim: acho o primeiro dir_entry_t dir[4096] vazio, e vou preencher la. attributes = 1 pra indicar dir, first_block eu marco a primeira entrada livre na FAT (11, no começo). e marco no indice 11 da fat como 0xffff.
+
+digamos que exista /home/arq.txt:
+
+durante um ls /home, acontece o seguinte:
+
+1) carrego o rootdir do disco (as 32 structs), e procuro o home ali (o filename sera "home" apenas! tudo dentro do rootdir é filho de /)
+2) dai eu pego o first_block do home, e carrego este bloco (que é outra dir_entry_t) - que sao 1024 bytes, ond a cada 32 pode existir algo. é só testar se o filename é diferente de 0 e significa que tem coisa. cuidado qque pode ter buracos no meio, entao tem que ler ate o final.
+
+====
+
+o size é importante pq um arquivo pode nao ocupar um bloco inteiro!
+
 // FGTODO
 
