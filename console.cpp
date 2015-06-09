@@ -1,21 +1,18 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string>
+#include <vector>
 
-#include "utils.h"
+#include "console.h"
+#include "command.h"
 
-std::string parse_command(const std::string& input) {
-  std::string cmd = trim(input);
-  return cmd.substr(0, cmd.find(' '));
-}
-
-void run_command(const std::string &cmd){
-  if (cmd == "exit"){
+void run_command(const Command *command){
+  if (command->cmd == "exit"){
     exit(0);
-  } else if (cmd == "") {
+  } else if (command->cmd == "") {
     std::cout << " => No command provided!" << std::endl;
   } else {
-    std::cout << " => Will execute: " << parse_command(cmd) << std::endl;
+    std::cout << " => Will execute: " << command->cmd << std::endl;
   }
 }
 
@@ -25,6 +22,6 @@ void run_console() {
     std::cout << "$ ";
     std::string cmd;
     getline(std::cin, cmd);
-    run_command(parse_command(cmd));
+    run_command(Command::parse(cmd));
   }
 }
