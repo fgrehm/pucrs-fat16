@@ -1,4 +1,5 @@
 pucrs-fat16
 fat.part
+core
 *.o
 *.swp

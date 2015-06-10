@@ -4,7 +4,7 @@
 
 int main() {
 
-  FileSystem fs("fat.part");
+  FileSystem fs("./fat.part");
   fs.debug();
 
   run_console();

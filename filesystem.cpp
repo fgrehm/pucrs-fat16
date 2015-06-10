@@ -2,7 +2,9 @@
 #include "filesystem.h"
 
 #include <iostream>
-#include <fstream>
+
+#include <stdio.h>
+#include <string.h>
 
 FileSystem::FileSystem(const std::string &partfname):m_partfilename(partfname), m_fat(), m_rootdir(), m_datablocks(){
 }
@@ -19,10 +21,14 @@ void FileSystem::debug(){
 
 int FileSystem::init(){
 
+  FILE* fd = fopen(m_partfilename.c_str(), "wb+");
+
   // step 1: writeout 1024 0xbb's
-  std::ofstream partfile;
-  partfile.open("./fat.part");
-  partfile.close();
+  unsigned char bootblock[1024];
+  memset(bootblock, 0xbb, sizeof(bootblock));
+  fwrite(bootblock, 1, sizeof(bootblock), fd);
+
+  fclose(fd);
 
   return RET_OK;
 
