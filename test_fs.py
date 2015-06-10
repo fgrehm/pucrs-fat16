@@ -1,16 +1,21 @@
 #!/usr/bin/env python
 
 import os
+import sys
 
 if __name__ == "__main__":
 
+  if len(sys.argv) < 2:
+      print("Uso: test_fs.py part_file_name")
+      exit(1)
+
   # testa tamanho do FS virtual total
-  statinfo = os.stat('fat.part')
+  statinfo = os.stat(sys.argv[1])
   if statinfo.st_size != 4194304:
-    print("fat.part tamanho invalido. Deve ter exatamente 4Mb (4194304).")
+    print("Tamanho invalido. Deve ter exatamente 4Mb (4194304).")
     exit(1)
 
-  with open("./fat.part", "rb") as f:
+  with open(sys.argv[1], "rb") as f:
 
     # testa integridade do boot block
     for i in xrange(1024):
@@ -18,7 +23,7 @@ if __name__ == "__main__":
       if ord(b) != 0xbb:
         print("Boot block invalido no offset %d." % i)
         exit(1)
-    print("boot block: OK...")
+    print("Boot block: OK...")
 
     # testa integridade do header da FAT16
     b = f.read(2)
