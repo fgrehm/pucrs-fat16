@@ -21,8 +21,10 @@ class FileSystem {
 
   public:
 
-    FileSystem();
+    FileSystem(const std::string &);
     ~FileSystem();
+
+    void debug(); // for debugging purposes only
 
     /* Filesystem interface begin */
     int init(); // resets the virtual FS and writes it to the real disk
@@ -40,6 +42,7 @@ class FileSystem {
 
   private:
 
+    const std::string m_partfilename;
     Fat16 m_fat;
     RootDir m_rootdir;
     DataBlocks m_datablocks;

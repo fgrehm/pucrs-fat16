@@ -1,7 +1,12 @@
+
 #include "console.h"
+#include "filesystem.h"
 
 int main() {
-  // TODO: Add filesystem initialization logic over here
+
+  FileSystem fs("fat.part");
+  fs.debug();
+
   run_console();
   return 0;
 }
