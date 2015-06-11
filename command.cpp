@@ -5,11 +5,33 @@
 #include "utils.h"
 #include "command.h"
 
-Command::Command(const std::string &n, const std::string &o) : name(n), error_message(), opts() {
-  // fgtodo: Tratar `write "foo  bar" /dir/file` corretamente, split nao vai ser suficiente
-  opts = split(o, ' ');
-}
-Command::~Command() {}
+/***************************************************
+ * Custom commands logic
+ ***************************************************/
+
+class InvalidCommand : public Command {
+  public:
+    InvalidCommand(const std::string &n, const std::string& o) : Command(n, o) {}
+
+    bool validate() {
+      error_message = name + ": command not found";
+      return false;
+    }
+};
+
+class ExitCommand : public Command {
+  public:
+    ExitCommand(const std::string &n, const std::string& o) : Command(n, o) {}
+
+    void run() {
+      std::cout << "[DEBUG] Exiting..." << std::endl;
+      exit(0);
+    }
+};
+
+/***************************************************
+ * Command "factory"
+ ***************************************************/
 
 Command *Command::parse(const std::string& input) {
   std::string cmd_name = input;
@@ -31,6 +53,16 @@ Command *Command::parse(const std::string& input) {
   return new InvalidCommand(cmd_name, raw_opts);
 }
 
+/***************************************************
+ * Logic common to all commands
+ ***************************************************/
+
+Command::Command(const std::string &n, const std::string &o) : name(n), error_message(), opts() {
+  // fgtodo: Tratar `write "foo  bar" /dir/file` corretamente, split nao vai ser suficiente
+  opts = split(o, ' ');
+}
+Command::~Command() {}
+
 bool Command::validate() {
   return true;
 }
@@ -42,18 +74,4 @@ void Command::run() {
     std::cout << "['" << join(opts, "', '") << "']";
   }
   std::cout << std::endl;
-}
-
-/***************************************************
- * Custom commands logic
- ***************************************************/
-
-bool InvalidCommand::validate() {
-  error_message = name + ": command not found";
-  return false;
-}
-
-void ExitCommand::run() {
-  std::cout << "[DEBUG] Exiting..." << std::endl;
-  exit(0);
 }
