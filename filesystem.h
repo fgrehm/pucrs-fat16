@@ -2,13 +2,10 @@
 #ifndef _FILESYSTEM_H_
 #define _FILESYSTEM_H_
 
-#include "fat16.h"
-#include "rootdir.h"
-#include "datablocks.h"
-
 #include <vector>
 #include <string>
 
+/* Interface return codes begin */
 #define RET_OK 0
 #define RET_NONEXISTANT_PATH 1
 #define RET_NONEXISTANT_FILE 2
@@ -16,6 +13,19 @@
 #define RET_FILE_ALREADY_EXISTS 4
 #define RET_FS_FULL 5
 #define RET_DIR_NOT_EMPTY 6
+/* Interface return codes end */
+
+/* Data structures begin */
+
+typedef struct {
+  unsigned char filename[18];
+  unsigned char attributes;
+  unsigned char reserved[7];
+  unsigned char first_block;
+  unsigned char size;
+} dir_entry_t;
+
+/* Data structures end */
 
 class FileSystem {
 
@@ -42,10 +52,10 @@ class FileSystem {
 
   private:
 
-    const std::string m_partfilename;
-    Fat16 m_fat;
-    RootDir m_rootdir;
-    DataBlocks m_datablocks;
+    const std::string partfilename;
+    unsigned short fat[4096];
+    unsigned char datablocks[1024];
+    dir_entry_t rootdir[32];
 
 };
 

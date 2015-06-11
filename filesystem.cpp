@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-FileSystem::FileSystem(const std::string &partfname):m_partfilename(partfname), m_fat(), m_rootdir(), m_datablocks(){
+FileSystem::FileSystem(const std::string &partfname):partfilename(partfname){
 }
 
 FileSystem::~FileSystem(){
@@ -21,7 +21,7 @@ void FileSystem::debug(){
 
 int FileSystem::init(){
 
-  FILE* fd = fopen(m_partfilename.c_str(), "wb+");
+  FILE* fd = fopen(partfilename.c_str(), "wb+");
 
   // step 1: writeout 1024 0xbb's
   unsigned char bootblock[1024];
@@ -54,7 +54,10 @@ int FileSystem::init(){
 }
 
 int FileSystem::load(){
-  return -1;
+
+  // mvtodo: load fat into ram 
+
+  return RET_OK;
 }
 
 int FileSystem::listdir(const std::string &path, std::vector<std::string> &result){
