@@ -16,7 +16,7 @@ FileSystem::~FileSystem(){
 void FileSystem::debug(){
 
   std::cout << "Debugging the filesystem class..." << std::endl;
-  this->init();
+  //this->init();
   this->load();
   this->makedir("/home");
 
@@ -58,13 +58,15 @@ int FileSystem::init(){
 
 int FileSystem::load(){
 
-  // mvtodo: nao ler a particao diretamente, usar read_block() instead
-  FILE* fd = fopen(part_filename.c_str(), "rb+");
-  fseek(fd, 1024, SEEK_SET);
-  fread(fat, 1, sizeof(fat), fd);
-  fclose(fd);
+  for (unsigned int i=0; i<4; i++){
 
-  // TODO: Handle errors when file manipulation goes wrong
+    //mvtodo: this is likely bugged
+    unsigned int j = (i + 1) * 1024;
+    if (!readblock(&(fat[i*1024]), j)){
+      // TODO: Handle errors when file manipulation goes wrong
+    }
+
+  }
 
   return RET_OK;
 
@@ -138,6 +140,7 @@ int FileSystem::find_free_rootdir() const {
 
 bool FileSystem::readblock(void *into, const unsigned int offset) const {
 
+  //mvtodo: this is likely bugged
   FILE* fd = fopen(part_filename.c_str(), "rb+");
   fseek(fd, offset, SEEK_SET);
   fread(into, 1, 1024, fd);
