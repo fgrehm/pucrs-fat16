@@ -59,7 +59,7 @@ class FileSystem {
     bool readblock(void*, const unsigned int) const;
 
     const std::string part_filename;
-    unsigned short fat[4096];
+    unsigned char fat[8192];
     unsigned char datablocks[1024];
     dir_entry_t rootdir[32];
 

@@ -58,11 +58,9 @@ int FileSystem::init(){
 
 int FileSystem::load(){
 
-  for (unsigned int i=0; i<4; i++){
+  for (unsigned int i=0; i<8; i++){
 
-    //mvtodo: this is likely bugged
-    unsigned int j = (i + 1) * 1024;
-    if (!readblock(&(fat[i*1024]), j)){
+    if (!readblock(&(fat[i*1024]), (i+1) * 1024)){
       // TODO: Handle errors when file manipulation goes wrong
     }
 
@@ -140,7 +138,6 @@ int FileSystem::find_free_rootdir() const {
 
 bool FileSystem::readblock(void *into, const unsigned int offset) const {
 
-  //mvtodo: this is likely bugged
   FILE* fd = fopen(part_filename.c_str(), "rb+");
   fseek(fd, offset, SEEK_SET);
   fread(into, 1, 1024, fd);
