@@ -26,14 +26,14 @@ Command *Command::parse(const std::string& input) {
   }
 
   std::cout << "[DEBUG] Returning default command..." << std::endl;
-  return new BaseCommand(cmd_name, raw_opts);
+  return new Command(cmd_name, raw_opts);
 }
 
-bool BaseCommand::validate() {
+bool Command::validate() {
   return true;
 }
 
-void BaseCommand::run() {
+void Command::run() {
   if (name == "") {
     std::cout << " => No command provided!" << std::endl;
   } else {

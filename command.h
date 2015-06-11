@@ -11,25 +11,17 @@ class Command {
     Command(const std::string&, const std::string&);
     virtual ~Command();
 
-    virtual bool validate() = 0;
-    virtual void run() = 0;
+    virtual bool validate();
+    virtual void run();
 
     std::string name;
     std::string error_message;
     std::vector<std::string> opts;
 };
 
-class BaseCommand : public Command {
+class ExitCommand : public Command {
   public:
-    BaseCommand(const std::string &n, const std::string& o) : Command(n, o) {}
-
-    virtual bool validate();
-    virtual void run();
-};
-
-class ExitCommand : public BaseCommand {
-  public:
-    ExitCommand(const std::string &n, const std::string& o) : BaseCommand(n, o) {}
+    ExitCommand(const std::string &n, const std::string& o) : Command(n, o) {}
 
     void run();
 };
