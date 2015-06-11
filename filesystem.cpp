@@ -16,6 +16,7 @@ void FileSystem::debug(){
 
   std::cout << "Debugging the filesystem class..." << std::endl;
   this->init();
+  this->load();
 
 }
 
@@ -57,7 +58,13 @@ int FileSystem::load(){
 
   // mvtodo: load fat into ram 
 
+  FILE* fd = fopen(partfilename.c_str(), "rb+");
+  fseek(fd, 1024, SEEK_SET);
+  fread(fat, 1, sizeof(fat), fd);
+  fclose(fd);
+
   return RET_OK;
+
 }
 
 int FileSystem::listdir(const std::string &path, std::vector<std::string> &result){
