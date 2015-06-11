@@ -20,13 +20,29 @@ std::string trim(const std::string &s) {
 }
 
 std::vector<std::string> tokenize_path(const std::string &path){
+
+  std::string i_path = path;
   std::vector<std::string> ret;
-  for (int i=0; i<path.size(); i++){
-    if (path[i] == '/'){
-      // ...
-      // mvtodo: implement
+
+  // paths must be input in the format home/file.txt/ for the algorithm to work
+  // i.e. no / in the beginning and / present in the end
+  if (i_path[0] == '/'){
+    i_path = i_path.substr(1, i_path.size()-1);
+  }
+  if (i_path[i_path.size()-1] != '/'){
+    i_path += '/';
+  }
+
+  std::string partial;
+  for (unsigned int i=0; i<i_path.size(); i++){
+    if (i_path[i] == '/'){
+      ret.push_back(partial);
+      partial="";
+    } else {
+      partial += i_path[i];
     }
   }
+
   return ret;
 }
 
