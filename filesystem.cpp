@@ -16,41 +16,51 @@ FileSystem::~FileSystem(){
 void FileSystem::debug(){
 
   std::cout << "Debugging the filesystem class..." << std::endl;
-  //this->init();
-  this->load();
+  this->init();
+  //this->load();
   this->makedir("/home");
 
 }
 
 int FileSystem::init(){
 
-  FILE* fd = fopen(part_filename.c_str(), "wb+");
+  // mvtodo: remove fat.part before "formatting"
 
   // step 1: writeout 1024 0xbb's
   unsigned char bootblock[1024];
   memset(bootblock, 0xbb, sizeof(bootblock));
-  fwrite(bootblock, 1, sizeof(bootblock), fd);
+  if (!writeblock(bootblock, 0)){
+    // mvtodo: tratar erro aqui
+  }
 
   // step 2: writeout the fat "header"
-  unsigned char fatheader[20] = {0xff, 0xfd,
-                                 0xff, 0xfe,
-                                 0xff, 0xfe,
-                                 0xff, 0xfe,
-                                 0xff, 0xfe,
-                                 0xff, 0xfe,
-                                 0xff, 0xfe,
-                                 0xff, 0xfe,
-                                 0xff, 0xfe,
-                                 0xff, 0xff};
+  unsigned char fatheader[8192] = {0xff, 0xfd,
+                                   0xff, 0xfe,
+                                   0xff, 0xfe,
+                                   0xff, 0xfe,
+                                   0xff, 0xfe,
+                                   0xff, 0xfe,
+                                   0xff, 0xfe,
+                                   0xff, 0xfe,
+                                   0xff, 0xfe,
+                                   0xff, 0xff};
 
-  fwrite(fatheader, 1, sizeof(fatheader), fd);
+  memset(fatheader+20, 0x00, sizeof(fatheader)-20);
+  for (unsigned int i=0; i<8; i++){
+    if (!writeblock(&(fatheader[i*1024]), (i+1)*1024)){
+      // mvtodo: tratar erro aqui
+    }
+  }
 
   // step 3: writeout blank rest
-  unsigned char blankrest[4193260];
+  unsigned char blankrest[4185088];
   memset(blankrest, 0x00, sizeof(blankrest));
-  fwrite(blankrest, 1, sizeof(blankrest), fd);
-
-  fclose(fd);
+  for (unsigned int i=0; i<4087; i++){
+    // mvtodo: howcome (i+1)*1024 passed the python script test??
+    if (!writeblock(blankrest, (i+9)*1024)){
+      // mvtodo: tratar erro aqui
+    }
+  } 
 
   return RET_OK;
 
@@ -138,7 +148,8 @@ int FileSystem::find_free_rootdir() const {
 
 bool FileSystem::readblock(void *into, const unsigned int offset) const {
 
-  FILE* fd = fopen(part_filename.c_str(), "rb+");
+  FILE* fd = fopen(part_filename.c_str(), "rb");
+  // mvtodo: treat errors
   fseek(fd, offset, SEEK_SET);
   fread(into, 1, 1024, fd);
   fclose(fd);
@@ -148,7 +159,8 @@ bool FileSystem::readblock(void *into, const unsigned int offset) const {
 
 bool FileSystem::writeblock(void *buf, const unsigned int offset){
 
-  FILE* fd = fopen(part_filename.c_str(), "wb+");
+  FILE* fd = fopen(part_filename.c_str(), "ab");
+  // mvtodo: treat errors
   fseek(fd, offset, SEEK_SET);
   fwrite(buf, 1, 1024, fd);
   fclose(fd);
