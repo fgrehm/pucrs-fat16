@@ -5,14 +5,20 @@
 
 #include "console.h"
 #include "command.h"
+#include "utils.h"
 
 void run_command(const Command *command){
-  if (command->cmd == "exit"){
+  if (command->name == "exit"){
     exit(0);
-  } else if (command->cmd == "") {
+  } else if (command->name == "") {
     std::cout << " => No command provided!" << std::endl;
   } else {
-    std::cout << " => Will execute: " << command->cmd << std::endl;
+    std::cout << " => Will execute: '" << command->name << "'" << std::endl;
+    std::cout << "    -> Arguments provided: ";
+    if (command->opts.size() > 0) {
+      std::cout << "['" << join(command->opts, "', '") << "']";
+    }
+    std::cout << std::endl;
   }
 }
 

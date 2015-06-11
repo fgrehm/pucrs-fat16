@@ -32,3 +32,4 @@ o size é importante pq um arquivo pode nao ocupar um bloco inteiro!
 
 // FGTODO
 
+- Tratar `write "foo  bar" /dir/file` corretamente

@@ -6,12 +6,12 @@
 
 class Command {
   public:
-    static Command* parse(const std::string &);
+    static Command* parse(const std::string&);
 
-    Command();
+    Command(const std::string&, const std::string&);
     ~Command();
 
-    std::string cmd;
+    std::string name;
     std::vector<std::string> opts;
 };
 
