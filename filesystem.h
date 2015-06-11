@@ -40,8 +40,8 @@ class FileSystem {
     int init(); // resets the virtual FS and writes it to the real disk
     int load(); // loads the virtual FS from the real disk
 
-    int listdir(const std::string &, std::vector<std::string> &); // reads the contents of a path
     int makedir(const std::string &); // makes a new dir on the given path
+    int listdir(const std::string &, std::vector<std::string> &); // reads the contents of a path
     int createfile(const std::string &); // creates a file on the given path
     int unlink(const std::string &); // deletes file or dir on the given path
 

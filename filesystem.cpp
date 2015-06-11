@@ -56,8 +56,6 @@ int FileSystem::init(){
 
 int FileSystem::load(){
 
-  // mvtodo: load fat into ram 
-
   FILE* fd = fopen(partfilename.c_str(), "rb+");
   fseek(fd, 1024, SEEK_SET);
   fread(fat, 1, sizeof(fat), fd);
@@ -67,14 +65,14 @@ int FileSystem::load(){
 
 }
 
-int FileSystem::listdir(const std::string &path, std::vector<std::string> &result){
+int FileSystem::makedir(const std::string &path){
   (void)path;
-  (void)result;
   return -1;
 }
 
-int FileSystem::makedir(const std::string &path){
+int FileSystem::listdir(const std::string &path, std::vector<std::string> &result){
   (void)path;
+  (void)result;
   return -1;
 }
 
