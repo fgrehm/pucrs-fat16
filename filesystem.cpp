@@ -28,6 +28,25 @@ int FileSystem::init(){
   memset(bootblock, 0xbb, sizeof(bootblock));
   fwrite(bootblock, 1, sizeof(bootblock), fd);
 
+  // step 2: writeout the fat "header"
+  unsigned char fatheader[20] = {0xff, 0xfd,
+                                 0xff, 0xfe,
+                                 0xff, 0xfe,
+                                 0xff, 0xfe,
+                                 0xff, 0xfe,
+                                 0xff, 0xfe,
+                                 0xff, 0xfe,
+                                 0xff, 0xfe,
+                                 0xff, 0xfe,
+                                 0xff, 0xff};
+
+  fwrite(fatheader, 1, sizeof(fatheader), fd);
+
+  // step 3: writeout blank rest
+  unsigned char blankrest[4193260];
+  memset(blankrest, 0x00, sizeof(blankrest));
+  fwrite(blankrest, 1, sizeof(blankrest), fd);
+
   fclose(fd);
 
   return RET_OK;
