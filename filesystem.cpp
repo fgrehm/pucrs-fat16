@@ -61,6 +61,8 @@ int FileSystem::load(){
   fread(fat, 1, sizeof(fat), fd);
   fclose(fd);
 
+  // TODO: Handle errors when file manipulation goes wrong
+
   return RET_OK;
 
 }

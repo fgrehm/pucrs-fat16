@@ -3,7 +3,6 @@
 #include "filesystem.h"
 
 int main() {
-
   FileSystem fs("./fat.part");
   fs.debug();
 
