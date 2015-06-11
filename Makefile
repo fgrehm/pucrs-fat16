@@ -59,3 +59,5 @@ clean:
 	rm -rf $(OBJ)
 	rm -rf $(TESTAPPNAME)
 
+test: compile link
+	basht test-shell.bash
