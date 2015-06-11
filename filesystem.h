@@ -13,6 +13,7 @@
 #define RET_FILE_ALREADY_EXISTS 4
 #define RET_FS_FULL 5
 #define RET_DIR_NOT_EMPTY 6
+#define RET_ROOTDIR_FULL 7
 /* Interface return codes end */
 
 /* Data structures begin */
@@ -52,7 +53,12 @@ class FileSystem {
 
   private:
 
-    const std::string partfilename;
+    // auxiliary operations
+    int find_free_rootdir() const;
+
+    bool readblock(void*, const unsigned int) const;
+
+    const std::string part_filename;
     unsigned short fat[4096];
     unsigned char datablocks[1024];
     dir_entry_t rootdir[32];

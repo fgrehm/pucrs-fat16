@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-FileSystem::FileSystem(const std::string &partfname):partfilename(partfname){
+FileSystem::FileSystem(const std::string &partfname):part_filename(partfname){
 }
 
 FileSystem::~FileSystem(){
@@ -18,12 +18,13 @@ void FileSystem::debug(){
   std::cout << "Debugging the filesystem class..." << std::endl;
   this->init();
   this->load();
+  this->makedir("/home");
 
 }
 
 int FileSystem::init(){
 
-  FILE* fd = fopen(partfilename.c_str(), "wb+");
+  FILE* fd = fopen(part_filename.c_str(), "wb+");
 
   // step 1: writeout 1024 0xbb's
   unsigned char bootblock[1024];
@@ -57,7 +58,8 @@ int FileSystem::init(){
 
 int FileSystem::load(){
 
-  FILE* fd = fopen(partfilename.c_str(), "rb+");
+  // mvtodo: nao ler a particao diretamente, usar read_block() instead
+  FILE* fd = fopen(part_filename.c_str(), "rb+");
   fseek(fd, 1024, SEEK_SET);
   fread(fat, 1, sizeof(fat), fd);
   fclose(fd);
@@ -69,8 +71,23 @@ int FileSystem::load(){
 }
 
 int FileSystem::makedir(const std::string &path){
-  (void)path;
-  return -1;
+
+  std::vector<std::string> ret = tokenize_path(path);
+
+  for (unsigned int i=0; i<ret.size(); i++){
+
+    int const rid = find_free_rootdir();
+    if (rid == -1){
+      return RET_ROOTDIR_FULL;
+    }
+ 
+    if (i==0){ // root dir
+    } else {
+    }
+
+  }
+
+  return RET_OK;
 }
 
 int FileSystem::listdir(const std::string &path, std::vector<std::string> &result){
@@ -105,5 +122,27 @@ int FileSystem::read(const std::string &path, std::string &content){
   (void)path;
   (void)content;
   return -1;
+}
+
+int FileSystem::find_free_rootdir() const {
+
+
+
+  for (unsigned int i=0; i<sizeof(rootdir); i++){
+    if (rootdir[i].filename[0] == 0x00){
+      return i;
+    }
+  }
+  return -1;
+}
+
+bool FileSystem::readblock(void *into, const unsigned int offset) const {
+
+  FILE* fd = fopen(part_filename.c_str(), "rb+");
+  fseek(fd, offset, SEEK_SET);
+  fread(into, 1, 1024, fd);
+  fclose(fd);
+
+  return true;
 }
 
