@@ -12,7 +12,7 @@ Command::Command(const std::string &n, const std::string &o) : name(n), error_me
 Command::~Command() {}
 
 Command *Command::parse(const std::string& input) {
-  std::string cmd_name = trim(input);
+  std::string cmd_name = input;
   std::string raw_opts;
 
   if (cmd_name.find(' ') != std::string::npos) {
@@ -23,10 +23,12 @@ Command *Command::parse(const std::string& input) {
 
   if (cmd_name == "exit") {
     return new ExitCommand(cmd_name, raw_opts);
+  } else if (cmd_name == "init") {
+    std::cout << "[DEBUG] Returning dummy command..." << std::endl;
+    return new Command(cmd_name, raw_opts);
   }
 
-  std::cout << "[DEBUG] Returning default command..." << std::endl;
-  return new Command(cmd_name, raw_opts);
+  return new InvalidCommand(cmd_name, raw_opts);
 }
 
 bool Command::validate() {
@@ -34,16 +36,21 @@ bool Command::validate() {
 }
 
 void Command::run() {
-  if (name == "") {
-    std::cout << " => No command provided!" << std::endl;
-  } else {
-    std::cout << " => Will execute: '" << name << "'" << std::endl;
-    std::cout << "    -> Arguments provided: ";
-    if (opts.size() > 0) {
-      std::cout << "['" << join(opts, "', '") << "']";
-    }
-    std::cout << std::endl;
+  std::cout << " => Will execute: '" << name << "'" << std::endl;
+  std::cout << "    -> Arguments provided: ";
+  if (opts.size() > 0) {
+    std::cout << "['" << join(opts, "', '") << "']";
   }
+  std::cout << std::endl;
+}
+
+/***************************************************
+ * Custom commands logic
+ ***************************************************/
+
+bool InvalidCommand::validate() {
+  error_message = name + ": command not found";
+  return false;
 }
 
 void ExitCommand::run() {

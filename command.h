@@ -19,6 +19,13 @@ class Command {
     std::vector<std::string> opts;
 };
 
+class InvalidCommand : public Command {
+  public:
+    InvalidCommand(const std::string &n, const std::string& o) : Command(n, o) {}
+
+    bool validate();
+};
+
 class ExitCommand : public Command {
   public:
     ExitCommand(const std::string &n, const std::string& o) : Command(n, o) {}

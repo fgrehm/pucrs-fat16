@@ -20,6 +20,8 @@ void run_console() {
     std::cout << "$ ";
     std::string cmd;
     getline(std::cin, cmd);
-    run_command(Command::parse(cmd));
+    cmd = trim(cmd);
+    if (cmd != "")
+      run_command(Command::parse(cmd));
   }
 }
