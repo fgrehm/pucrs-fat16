@@ -45,7 +45,20 @@ Command *Command::parse(const std::string& input) {
 
   if (cmd_name == "exit") {
     return new ExitCommand(cmd_name, raw_opts);
-  } else if (cmd_name == "init") {
+  }
+
+  // fgtodo: Criar as classes apropriadas para cada comando
+  bool valid_command = cmd_name == "init" \
+                       || cmd_name == "load" \
+                       || cmd_name == "ls" \
+                       || cmd_name == "mkdir" \
+                       || cmd_name == "create" \
+                       || cmd_name == "unlink" \
+                       || cmd_name == "write" \
+                       || cmd_name == "append" \
+                       || cmd_name == "read";
+
+  if (valid_command) {
     std::cout << "[DEBUG] Returning dummy command..." << std::endl;
     return new Command(cmd_name, raw_opts);
   }
