@@ -19,7 +19,9 @@ void run_console() {
   while (true) {
     std::cout << "$ ";
     std::string cmd;
-    getline(std::cin, cmd);
+
+    if (!getline(std::cin, cmd)) break;
+
     cmd = trim(cmd);
     if (cmd != "")
       run_command(Command::parse(cmd));
