@@ -7,19 +7,11 @@
 #include "command.h"
 #include "utils.h"
 
-void run_command(const Command *command){
-  if (command->name == "exit"){
-    exit(0);
-  } else if (command->name == "") {
-    std::cout << " => No command provided!" << std::endl;
-  } else {
-    std::cout << " => Will execute: '" << command->name << "'" << std::endl;
-    std::cout << "    -> Arguments provided: ";
-    if (command->opts.size() > 0) {
-      std::cout << "['" << join(command->opts, "', '") << "']";
-    }
-    std::cout << std::endl;
-  }
+void run_command(Command command){
+  if (command.validate())
+    command.run();
+  else
+    std::cout << command.error_message << std::endl;
 }
 
 void run_console() {
