@@ -1,4 +1,5 @@
-#include <string>
+
+#include "utils.h"
 
 // Trim from both ends
 // Based on http://ideone.com/nFVtEo
@@ -13,3 +14,15 @@ std::string trim(const std::string &s) {
 
   return std::string(it, rit.base());
 }
+
+std::vector<std::string> tokenize_path(const std::string &path){
+  std::vector<std::string> ret;
+  for (int i=0; i<path.size(); i++){
+    if (path[i] == '/'){
+      // ...
+      // mvtodo: implement
+    }
+  }
+  return ret;
+}
+
