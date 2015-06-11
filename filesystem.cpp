@@ -146,3 +146,14 @@ bool FileSystem::readblock(void *into, const unsigned int offset) const {
   return true;
 }
 
+bool FileSystem::writeblock(void *buf, const unsigned int offset){
+
+  FILE* fd = fopen(part_filename.c_str(), "wb+");
+  fseek(fd, offset, SEEK_SET);
+  fwrite(buf, 1, 1024, fd);
+  fclose(fd);
+
+  return true;
+
+}
+

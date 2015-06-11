@@ -57,6 +57,7 @@ class FileSystem {
     int find_free_rootdir() const;
 
     bool readblock(void*, const unsigned int) const;
+    bool writeblock(void*, const unsigned int);
 
     const std::string part_filename;
     unsigned char fat[8192];
