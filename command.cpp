@@ -24,8 +24,27 @@ class ExitCommand : public Command {
     ExitCommand(const std::string &n, const std::string& o) : Command(n, o) {}
 
     void run() {
-      std::cout << "[DEBUG] Exiting..." << std::endl;
       exit(0);
+    }
+};
+
+class InitCommand : public Command {
+  public:
+    InitCommand(const std::string &n, const std::string& o) : Command(n, o) {}
+
+    void run() {
+      std::cout << "=> Formating partition..." << std::endl;
+      std::cout << "=> DONE" << std::endl;
+    }
+};
+
+class LoadCommand : public Command {
+  public:
+    LoadCommand(const std::string &n, const std::string& o) : Command(n, o) {}
+
+    void run() {
+      std::cout << "=> Loading partition table..." << std::endl;
+      std::cout << "=> DONE" << std::endl;
     }
 };
 
@@ -43,9 +62,14 @@ Command *Command::parse(const std::string& input) {
     raw_opts = cmd.substr(cmd_name.length()+1, cmd.length());
   }
 
-  if (cmd_name == "exit") {
+  if (cmd_name == "exit")
     return new ExitCommand(cmd_name, raw_opts);
-  }
+
+  if (cmd_name == "init")
+    return new InitCommand(cmd_name, raw_opts);
+
+  if (cmd_name == "load")
+    return new LoadCommand(cmd_name, raw_opts);
 
   // fgtodo: Criar as classes apropriadas para cada comando
   bool valid_command = cmd_name == "init" \
