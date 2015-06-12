@@ -15,7 +15,7 @@ FileSystem::~FileSystem(){
 
 void FileSystem::debug(){
 
-  std::cout << "Debugging the filesystem class..." << std::endl;
+  ::debug("Debugging the filesystem class...");
   this->init();
   //this->load();
   this->makedir("/home");

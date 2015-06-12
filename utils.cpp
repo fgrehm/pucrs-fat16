@@ -5,6 +5,13 @@
 
 #include "utils.h"
 
+void debug(const std::string& msg) {
+  (void)msg; // Mute warnings
+#ifdef DEBUG
+  std::cout << "[DEBUG] " << msg << std::endl;
+#endif
+}
+
 // Trim from both ends
 // Based on http://ideone.com/nFVtEo
 std::string trim(const std::string &s) {
