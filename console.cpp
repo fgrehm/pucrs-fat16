@@ -7,14 +7,14 @@
 #include "command.h"
 #include "utils.h"
 
-void run_command(Command *command){
+void run_command(Command *command, FileSystem& fs){
   if (command->validate())
-    command->run();
+    command->run(fs);
   else
     std::cout << command->error_message << std::endl;
 }
 
-void run_console() {
+void run_console(FileSystem& fs) {
   std::cout << "PUCRS FAT16 SHELL" << std::endl;
   while (true) {
     std::cout << "$ ";
@@ -24,6 +24,6 @@ void run_console() {
 
     cmd = trim(cmd);
     if (cmd != "")
-      run_command(Command::parse(cmd));
+      run_command(Command::parse(cmd), fs);
   }
 }

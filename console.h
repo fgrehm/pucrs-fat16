@@ -1,6 +1,8 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-void run_console();
+#include "filesystem.h"
+
+void run_console(FileSystem&);
 
 #endif

@@ -60,7 +60,7 @@ int FileSystem::init(){
     if (!writeblock(blankrest, (i+9)*1024)){
       // mvtodo: tratar erro aqui
     }
-  } 
+  }
 
   return RET_OK;
 
@@ -90,7 +90,7 @@ int FileSystem::makedir(const std::string &path){
     if (rid == -1){
       return RET_ROOTDIR_FULL;
     }
- 
+
     if (i==0){ // root dir
     } else {
     }
