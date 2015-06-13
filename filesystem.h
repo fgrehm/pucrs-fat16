@@ -60,8 +60,9 @@ class FileSystem {
     // auxiliary operations
     int find_free_rootdir() const;
 
+    void dumpfat();
     bool readblock(void*, const unsigned int) const;
-    bool writeblock(void*, const unsigned int);
+    bool writeblock(const void*, const unsigned int);
     void createdummy() const;
 
     const std::string part_filename;

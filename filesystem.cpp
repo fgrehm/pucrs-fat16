@@ -7,6 +7,9 @@
 #include "utils.h"
 
 FileSystem::FileSystem(const std::string &partfname):part_filename(partfname), initialized(false){
+  memset(fat, 0x00, sizeof(fat));
+  memset(datablocks, 0x00, sizeof(datablocks));
+  memset(rootdir, 0x00, sizeof(rootdir));
 }
 
 FileSystem::~FileSystem(){
@@ -15,8 +18,13 @@ FileSystem::~FileSystem(){
 void FileSystem::debug(){
 
   ::debug("Debugging the filesystem class...");
-  this->init();
-  this->load();
+  if (this->init() != RET_OK){
+    ::debug("Init failed.");
+  }
+  if (this->load() != RET_OK){
+    ::debug("Load failed.");
+  }
+  //this->dumpfat();
   this->makedir("/home");
 
 }
@@ -30,7 +38,7 @@ int FileSystem::init(){
   unsigned char bootblock[1024];
   memset(bootblock, 0xbb, sizeof(bootblock));
   if (!writeblock(bootblock, 0)){
-    // mvtodo: tratar erro aqui
+    return RET_CANNOT_INITIALIZE;
   }
 
   // step 2: writeout the fat "header"
@@ -48,12 +56,13 @@ int FileSystem::init(){
   memset(fatheader+20, 0x00, sizeof(fatheader)-20);
   for (unsigned int i=0; i<8; i++){
     if (!writeblock(&(fatheader[i*1024]), (i+1)*1024)){
-      // mvtodo: tratar erro aqui
+      return RET_CANNOT_INITIALIZE;
     }
   }
 
   // step 3: we no longer have to writeout the blank rest because we now have a whole blankened dummy file from the beginning
 
+  initialized = true;
   return RET_OK;
 }
 
@@ -63,7 +72,7 @@ int FileSystem::load(){
   for (unsigned int i=0; i<8; i++){
 
     if (!readblock(&(fat[i*1024]), (i+1) * 1024)){
-      // TODO: Handle errors when file manipulation goes wrong
+      return RET_CANNOT_INITIALIZE;
     }
 
   }
@@ -158,7 +167,7 @@ bool FileSystem::readblock(void *into, const unsigned int offset) const {
 
 }
 
-bool FileSystem::writeblock(void *buf, const unsigned int offset){
+bool FileSystem::writeblock(const void * buf, const unsigned int offset){
 
   // we have to read and overwrite the whole file :S 
   unsigned char *wholebuffer = 0;
@@ -217,5 +226,11 @@ void FileSystem::createdummy() const {
 
   fclose(fd_write);
 
+}
+
+void FileSystem::dumpfat() {
+  for (unsigned int i=0; i<8; i++){
+    writeblock(&(fat[i*1024]), (i+1)*1024);
+  }
 }
 
