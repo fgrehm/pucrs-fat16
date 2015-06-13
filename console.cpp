@@ -11,7 +11,7 @@ void run_command(Command *command, FileSystem& fs){
   if (command->validate())
     command->run(fs);
   else
-    std::cout << command->error_message << std::endl;
+    std::cout << command->help_text << std::endl;
 }
 
 void run_console(FileSystem& fs) {

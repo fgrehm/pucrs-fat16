@@ -11,10 +11,11 @@
 
 class InvalidCommand : public Command {
   public:
-    InvalidCommand(const std::string &n, const std::string& o) : Command(n, o) {}
+    InvalidCommand(const std::string &n, const std::string& o) : Command(n, o) {
+      help_text = name + ": command not found";
+    }
 
     bool validate() {
-      error_message = name + ": command not found";
       return false;
     }
 };
@@ -43,9 +44,27 @@ class LoadCommand : public Command {
   public:
     LoadCommand(const std::string &n, const std::string& o) : Command(n, o) {}
 
-    void run(FileSystem&) {
+    void run(FileSystem& fs) {
       std::cout << "=> Loading partition table..." << std::endl;
+      fs.load();
       std::cout << "=> DONE" << std::endl;
+    }
+};
+
+class ListCommand : public Command {
+  public:
+    ListCommand(const std::string &n, const std::string& o) : Command(n, o) {
+      help_text = "USAGE: `ls /path/to/dir`";
+    }
+
+    bool validate() {
+      return opts.size() == 1;
+    }
+
+    void run(FileSystem& fs) {
+      (void)fs;
+      debug("Will list `" + opts[0] + "`");
+      // TODO: fs.listdir(opts[0], filesout);
     }
 };
 
@@ -72,10 +91,11 @@ Command *Command::parse(const std::string& input) {
   if (cmd_name == "load")
     return new LoadCommand(cmd_name, raw_opts);
 
+  if (cmd_name == "ls")
+    return new ListCommand(cmd_name, raw_opts);
+
   // fgtodo: Criar as classes apropriadas para cada comando
   bool valid_command = cmd_name == "init" \
-                       || cmd_name == "load" \
-                       || cmd_name == "ls" \
                        || cmd_name == "mkdir" \
                        || cmd_name == "create" \
                        || cmd_name == "unlink" \
@@ -95,7 +115,7 @@ Command *Command::parse(const std::string& input) {
  * Logic common to all commands
  ***************************************************/
 
-Command::Command(const std::string &n, const std::string &o) : name(n), error_message(), opts() {
+Command::Command(const std::string &n, const std::string &o) : name(n), help_text(), opts() {
   // fgtodo: Tratar `write "foo  bar" /dir/file` corretamente, split nao vai ser suficiente
   opts = split(o, ' ');
 }

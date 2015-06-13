@@ -6,6 +6,7 @@ export PARTITION_FILE="fat.test.part"
 
 run() {
   echo $1 | ./pucrs-fat16 2>&1
+  return $?
 }
 
 T_recognizes_all_valid_commands() {
@@ -60,4 +61,25 @@ T_init_recreates_partition_file() {
 
   fs_size=$(stat -c %s $PARTITION_FILE)
   [ $fs_size = '4194304' ] || $T_fail "Partition did not get wiped out"
+}
+
+
+T_ls_lists_dir_contents() {
+  rm -f $PARTITION_FILE
+
+  if ! run "init" > /dev/null; then
+    $T_fail "Initialization failed"
+    return 1
+  fi
+
+  if ! run "ls" | grep -q '^$ USAGE: `ls '; then
+    $T_fail "Did not validate empty path"
+    return 1
+  fi
+
+  # TODO: Write more specs for success behavior
+  if run "ls /foo/bar" | grep -q '^$ USAGE: `ls '; then
+    $T_fail "Did not recognize the parameter provided"
+    return 1
+  fi
 }

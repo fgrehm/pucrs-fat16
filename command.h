@@ -17,7 +17,7 @@ class Command {
     virtual void run(FileSystem&);
 
     std::string name;
-    std::string error_message;
+    std::string help_text;
     std::vector<std::string> opts;
 };
 
