@@ -102,6 +102,41 @@ class ListCommand : public Command {
     }
 };
 
+class UnlinkCommand : public Command {
+  public:
+    UnlinkCommand(const std::string &n, const std::string& o) : Command(n, o) {
+      help_text = "USAGE: `unlink /path/to/dir` (or file)";
+    }
+
+    bool validate() {
+      return opts.size() == 1;
+    }
+
+    void run(FileSystem& fs) {
+      (void)fs;
+      debug("Will unlink `" + opts[0] + "`");
+      // TODO: fs.listdir(opts[0], filesout);
+    }
+};
+
+class WriteCommand : public Command {
+  public:
+    WriteCommand(const std::string &n, const std::string& o) : Command(n, o) {
+      help_text = "USAGE: `write \"contents-to\" /path/to/file`";
+    }
+
+    bool validate() {
+      return opts.size() == 2;
+    }
+
+    void run(FileSystem& fs) {
+      (void)fs;
+      debug("Will write \"" + opts[0] + "\" to `" + opts[1] + "`");
+      // TODO: fs.listdir(opts[0], filesout);
+    }
+};
+
+
 /***************************************************
  * Command "factory"
  ***************************************************/
@@ -134,10 +169,14 @@ Command *Command::parse(const std::string& input) {
   if (cmd_name == "create")
     return new CreateCommand(cmd_name, raw_opts);
 
+  if (cmd_name == "unlink")
+    return new UnlinkCommand(cmd_name, raw_opts);
+
+  if (cmd_name == "write")
+    return new WriteCommand(cmd_name, raw_opts);
+
   // fgtodo: Criar as classes apropriadas para cada comando
-  bool valid_command = cmd_name == "unlink" \
-                       || cmd_name == "write" \
-                       || cmd_name == "append" \
+  bool valid_command = cmd_name == "append" \
                        || cmd_name == "read";
 
   if (valid_command) {

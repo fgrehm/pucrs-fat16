@@ -122,3 +122,48 @@ T_008_create_touches_a_file_on_fs() {
     return 1
   fi
 }
+
+T_009_unlink_removes_file_from_fs() {
+  rm -f $PARTITION_FILE
+
+  if ! run "init" > /dev/null; then
+    $T_fail "Initialization failed"
+    return 1
+  fi
+
+  if ! run "unlink" | grep -q '^$ USAGE: `unlink '; then
+    $T_fail "Did not validate empty path"
+    return 1
+  fi
+
+  # TODO: Write more specs for success behavior
+  if run "unlink /foo/bar" | grep -q '^$ USAGE: `unlink '; then
+    $T_fail "Did not recognize the parameter provided"
+    return 1
+  fi
+}
+
+T_010_write_writes_string_to_fs() {
+  rm -f $PARTITION_FILE
+
+  if ! run "init" > /dev/null; then
+    $T_fail "Initialization failed"
+    return 1
+  fi
+
+  if ! run "write" | grep -q '^$ USAGE: `write '; then
+    $T_fail "Did not validate empty path"
+    return 1
+  fi
+
+  if ! run "write /file-name" | grep -q '^$ USAGE: `write '; then
+    $T_fail "Allowed running with single argument"
+    return 1
+  fi
+
+  # TODO: Write more specs for success behavior
+  if run "write \"some-text\" /foo/bar" | grep -q '^$ USAGE: `write '; then
+    $T_fail "Did not recognize the parameters provided"
+    return 1
+  fi
+}
