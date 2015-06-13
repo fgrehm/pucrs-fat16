@@ -15,7 +15,10 @@
 #define RET_DIR_NOT_EMPTY 6
 #define RET_CANNOT_INITIALIZE 7
 #define RET_ROOTDIR_FULL 8
+#define RET_NOT_INITIALIZED 9
 /* Interface return codes end */
+
+#define CHECK_INIT if (!initialized) {return RET_NOT_INITIALIZED;}
 
 /* Data structures begin */
 
@@ -65,6 +68,8 @@ class FileSystem {
     unsigned char fat[8192];
     unsigned char datablocks[1024];
     dir_entry_t rootdir[32];
+
+    bool initialized;
 
 };
 

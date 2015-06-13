@@ -6,7 +6,7 @@
 #include "filesystem.h"
 #include "utils.h"
 
-FileSystem::FileSystem(const std::string &partfname):part_filename(partfname){
+FileSystem::FileSystem(const std::string &partfname):part_filename(partfname), initialized(false){
 }
 
 FileSystem::~FileSystem(){
@@ -58,6 +58,7 @@ int FileSystem::init(){
 }
 
 int FileSystem::load(){
+  CHECK_INIT 
 
   for (unsigned int i=0; i<8; i++){
 
@@ -72,6 +73,7 @@ int FileSystem::load(){
 }
 
 int FileSystem::makedir(const std::string &path){
+  CHECK_INIT 
 
   std::vector<std::string> ret = tokenize_path(path);
 
@@ -92,34 +94,42 @@ int FileSystem::makedir(const std::string &path){
 }
 
 int FileSystem::listdir(const std::string &path, std::vector<std::string> &result){
+  CHECK_INIT 
+
   (void)path;
   (void)result;
   return -1;
 }
 
 int FileSystem::createfile(const std::string &path){
+  CHECK_INIT 
   (void)path;
   return -1;
 }
 
 int FileSystem::unlink(const std::string &path){
+  CHECK_INIT 
   (void)path;
   return -1;
 }
 
 int FileSystem::write(const std::string &path, const std::string &content){
+  CHECK_INIT 
   (void)path;
   (void)content;
   return -1;
 }
 
 int FileSystem::append(const std::string &path, const std::string &content){
+  CHECK_INIT 
   (void)path;
   (void)content;
   return -1;
 }
 
 int FileSystem::read(const std::string &path, std::string &content){
+  CHECK_INIT 
+
   (void)path;
   (void)content;
   return -1;
