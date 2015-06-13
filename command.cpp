@@ -136,6 +136,40 @@ class WriteCommand : public Command {
     }
 };
 
+class AppendCommand : public Command {
+  public:
+    AppendCommand(const std::string &n, const std::string& o) : Command(n, o) {
+      help_text = "USAGE: `append \"contents-to\" /path/to/file`";
+    }
+
+    bool validate() {
+      return opts.size() == 2;
+    }
+
+    void run(FileSystem& fs) {
+      (void)fs;
+      debug("Will append \"" + opts[0] + "\" to `" + opts[1] + "`");
+      // TODO: fs.append(opts[0], filesout);
+    }
+};
+
+class ReadCommand : public Command {
+  public:
+    ReadCommand(const std::string &n, const std::string& o) : Command(n, o) {
+      help_text = "USAGE: `read /path/to/file`";
+    }
+
+    bool validate() {
+      return opts.size() == 1;
+    }
+
+    void run(FileSystem& fs) {
+      (void)fs;
+      debug("Will read `" + opts[0] + "`");
+      // TODO: fs.read(opts[0], fileout);
+    }
+};
+
 
 /***************************************************
  * Command "factory"
@@ -175,14 +209,11 @@ Command *Command::parse(const std::string& input) {
   if (cmd_name == "write")
     return new WriteCommand(cmd_name, raw_opts);
 
-  // fgtodo: Criar as classes apropriadas para cada comando
-  bool valid_command = cmd_name == "append" \
-                       || cmd_name == "read";
+  if (cmd_name == "append")
+    return new AppendCommand(cmd_name, raw_opts);
 
-  if (valid_command) {
-    std::cout << "[DEBUG] Returning dummy command..." << std::endl;
-    return new Command(cmd_name, raw_opts);
-  }
+  if (cmd_name == "read")
+    return new ReadCommand(cmd_name, raw_opts);
 
   return new InvalidCommand(cmd_name, raw_opts);
 }

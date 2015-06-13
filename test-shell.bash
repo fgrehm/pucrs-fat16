@@ -167,3 +167,48 @@ T_010_write_writes_string_to_fs() {
     return 1
   fi
 }
+
+T_010_append_appends_string_to_fs() {
+  rm -f $PARTITION_FILE
+
+  if ! run "init" > /dev/null; then
+    $T_fail "Initialization failed"
+    return 1
+  fi
+
+  if ! run "append" | grep -q '^$ USAGE: `append '; then
+    $T_fail "Did not validate empty path"
+    return 1
+  fi
+
+  if ! run "append /file-name" | grep -q '^$ USAGE: `append '; then
+    $T_fail "Allowed running with single argument"
+    return 1
+  fi
+
+  # TODO: append more specs for success behavior
+  if run "append \"some-text\" /foo/bar" | grep -q '^$ USAGE: `append '; then
+    $T_fail "Did not recognize the parameters provided"
+    return 1
+  fi
+}
+
+T_010_read_reads_file_from_fs() {
+  rm -f $PARTITION_FILE
+
+  if ! run "init" > /dev/null; then
+    $T_fail "Initialization failed"
+    return 1
+  fi
+
+  if ! run "read" | grep -q '^$ USAGE: `read '; then
+    $T_fail "Did not validate empty path"
+    return 1
+  fi
+
+  # TODO: read more specs for success behavior
+  if run "read /foo/bar" | grep -q '^$ USAGE: `read '; then
+    $T_fail "Did not recognize the parameters provided"
+    return 1
+  fi
+}
