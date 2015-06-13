@@ -9,7 +9,7 @@ run() {
   return $?
 }
 
-T_recognizes_all_valid_commands() {
+T_001_recognizes_all_valid_commands() {
   for cmd in init load ls mkdir create unlink write append read; do
     # Not needed once init is only handled by the shell
     rm -f $PARTITION_FILE
@@ -20,7 +20,7 @@ T_recognizes_all_valid_commands() {
   done
 }
 
-T_recognizes_invalid_commands() {
+T_002_recognizes_invalid_commands() {
   rm -f $PARTITION_FILE
   if ! run "WAT" | grep -q ': command not found$'; then
     $T_fail "'WAT' was recognized as a valid command"
@@ -28,7 +28,7 @@ T_recognizes_invalid_commands() {
   fi
 }
 
-T_init_creates_partition_file() {
+T_003_init_creates_partition_file() {
   rm -f $PARTITION_FILE
 
   if ! run "init" > /dev/null; then
@@ -39,7 +39,7 @@ T_init_creates_partition_file() {
   [[ -f $PARTITION_FILE ]] || $T_fail "Partition not created"
 }
 
-T_init_recreates_partition_file() {
+T_005_init_recreates_partition_file() {
   rm -f $PARTITION_FILE
 
   if ! run "init" > /dev/null; then
@@ -63,8 +63,27 @@ T_init_recreates_partition_file() {
   [ $fs_size = '4194304' ] || $T_fail "Partition did not get wiped out"
 }
 
+T_006_mkdir_creates_a_dir() {
+  rm -f $PARTITION_FILE
 
-T_ls_lists_dir_contents() {
+  if ! run "init" > /dev/null; then
+    $T_fail "Initialization failed"
+    return 1
+  fi
+
+  if ! run "mkdir" | grep -q '^$ USAGE: `mkdir '; then
+    $T_fail "Did not validate empty path"
+    return 1
+  fi
+
+  # TODO: Write more specs for success behavior
+  if run "mkdir /foo/bar" | grep -q '^$ USAGE: `mkdir '; then
+    $T_fail "Did not recognize the parameter provided"
+    return 1
+  fi
+}
+
+T_007_ls_lists_dir_contents() {
   rm -f $PARTITION_FILE
 
   if ! run "init" > /dev/null; then

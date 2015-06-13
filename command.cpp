@@ -51,6 +51,23 @@ class LoadCommand : public Command {
     }
 };
 
+class MakeDirCommand : public Command {
+  public:
+    MakeDirCommand(const std::string &n, const std::string& o) : Command(n, o) {
+      help_text = "USAGE: `mkdir /path/to/dir`";
+    }
+
+    bool validate() {
+      return opts.size() == 1;
+    }
+
+    void run(FileSystem& fs) {
+      (void)fs;
+      debug("Will create dir `" + opts[0] + "`");
+      // TODO: fs.listdir(opts[0], filesout);
+    }
+};
+
 class ListCommand : public Command {
   public:
     ListCommand(const std::string &n, const std::string& o) : Command(n, o) {
@@ -94,10 +111,11 @@ Command *Command::parse(const std::string& input) {
   if (cmd_name == "ls")
     return new ListCommand(cmd_name, raw_opts);
 
+  if (cmd_name == "mkdir")
+    return new MakeDirCommand(cmd_name, raw_opts);
+
   // fgtodo: Criar as classes apropriadas para cada comando
-  bool valid_command = cmd_name == "init" \
-                       || cmd_name == "mkdir" \
-                       || cmd_name == "create" \
+  bool valid_command = cmd_name == "create" \
                        || cmd_name == "unlink" \
                        || cmd_name == "write" \
                        || cmd_name == "append" \
