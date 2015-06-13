@@ -25,7 +25,7 @@ class ExitCommand : public Command {
     ExitCommand(const std::string &n, const std::string& o) : Command(n, o) {}
 
     void run(FileSystem&) {
-      exit(0);
+      exit(0); // TODO: this may cause memory leaks. lets change it if we can help it
     }
 };
 

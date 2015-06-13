@@ -16,8 +16,8 @@ void FileSystem::debug(){
 
   ::debug("Debugging the filesystem class...");
   this->init();
-  //this->load();
-  //this->makedir("/home");
+  this->load();
+  this->makedir("/home");
 
 }
 
