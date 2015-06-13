@@ -13,6 +13,7 @@ FileSystem::FileSystem(const std::string &partfname):part_filename(partfname), i
 }
 
 FileSystem::~FileSystem(){
+  dumpfat();
 }
 
 void FileSystem::debug(){
@@ -24,7 +25,6 @@ void FileSystem::debug(){
   if (this->load() != RET_OK){
     ::debug("Load failed.");
   }
-  //this->dumpfat();
   this->makedir("/home");
 
 }
