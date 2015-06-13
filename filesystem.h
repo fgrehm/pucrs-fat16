@@ -13,7 +13,8 @@
 #define RET_FILE_ALREADY_EXISTS 4
 #define RET_FS_FULL 5
 #define RET_DIR_NOT_EMPTY 6
-#define RET_ROOTDIR_FULL 7
+#define RET_CANNOT_INITIALIZE 7
+#define RET_ROOTDIR_FULL 8
 /* Interface return codes end */
 
 /* Data structures begin */
@@ -58,6 +59,7 @@ class FileSystem {
 
     bool readblock(void*, const unsigned int) const;
     bool writeblock(void*, const unsigned int);
+    void createdummy() const;
 
     const std::string part_filename;
     unsigned char fat[8192];

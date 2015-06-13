@@ -17,15 +17,14 @@ void FileSystem::debug(){
   ::debug("Debugging the filesystem class...");
   this->init();
   //this->load();
-  this->makedir("/home");
+  //this->makedir("/home");
 
 }
 
 int FileSystem::init(){
-  if (file_exists(part_filename) && remove(part_filename.c_str()) !=0) {
-    std::cout << "Remove operation failed" << std::endl;
-    exit(1);
-  }
+
+  remove(part_filename.c_str());
+  createdummy();
 
   // step 1: writeout 1024 0xbb's
   unsigned char bootblock[1024];
@@ -53,18 +52,9 @@ int FileSystem::init(){
     }
   }
 
-  // step 3: writeout blank rest
-  unsigned char blankrest[4185088];
-  memset(blankrest, 0x00, sizeof(blankrest));
-  for (unsigned int i=0; i<4087; i++){
-    // mvtodo: howcome (i+1)*1024 passed the python script test??
-    if (!writeblock(blankrest, (i+9)*1024)){
-      // mvtodo: tratar erro aqui
-    }
-  }
+  // step 3: we no longer have to writeout the blank rest because we now have a whole blankened dummy file from the beginning
 
   return RET_OK;
-
 }
 
 int FileSystem::load(){
@@ -136,9 +126,6 @@ int FileSystem::read(const std::string &path, std::string &content){
 }
 
 int FileSystem::find_free_rootdir() const {
-
-
-
   for (unsigned int i=0; i<sizeof(rootdir); i++){
     if (rootdir[i].filename[0] == 0x00){
       return i;
@@ -150,23 +137,75 @@ int FileSystem::find_free_rootdir() const {
 bool FileSystem::readblock(void *into, const unsigned int offset) const {
 
   FILE* fd = fopen(part_filename.c_str(), "rb");
-  // mvtodo: treat errors
+  if (fd == NULL){
+    return false;
+  }
   fseek(fd, offset, SEEK_SET);
   fread(into, 1, 1024, fd);
   fclose(fd);
 
   return true;
+
 }
 
 bool FileSystem::writeblock(void *buf, const unsigned int offset){
 
-  FILE* fd = fopen(part_filename.c_str(), "ab");
-  // mvtodo: treat errors
-  fseek(fd, offset, SEEK_SET);
-  fwrite(buf, 1, 1024, fd);
-  fclose(fd);
+  // we have to read and overwrite the whole file :S 
+  unsigned char *wholebuffer = 0;
+  long fsize = 0;
+
+  // open up partition file
+  FILE* fd_read = fopen(part_filename.c_str(), "rb");
+  if (fd_read == NULL){
+    return false;
+  }
+
+  // get its filesize
+  fseek(fd_read, 0L, SEEK_END);
+  fsize = ftell(fd_read);
+  //fseek(fd_read, 0L, SEEK_SET);
+  rewind(fd_read);
+
+  // allocate whole buffer (to store the whole file, yes!) and read into it
+  wholebuffer = (unsigned char*)calloc(fsize, 1);
+  fread(wholebuffer, 1, fsize, fd_read);
+  fclose(fd_read);
+
+  // change wholebuff contents with what this function was given
+  memcpy(wholebuffer+offset, buf, 1024);
+
+  // and finally write the whole thing back
+  FILE* fd_write = fopen(part_filename.c_str(), "wb");
+  if (fd_write == NULL){
+    return false;
+  }
+
+  // write, close, dealloc.. clenaup code.
+  fwrite(wholebuffer, 1, fsize, fd_write);
+  fclose(fd_write);
+  free(wholebuffer);
 
   return true;
+
+}
+
+void FileSystem::createdummy() const {
+
+  FILE* fd_write = fopen(part_filename.c_str(), "wb+");
+  // mvtodo: fopen error treating
+
+  // MV: for some reason, using more than a handful of K's on the stack was causing a segfault.
+  // took hours to figure it out, but theres a really DUMB solution down below
+  const unsigned long total = 4*1024*1024; // 4 mbs
+  const unsigned int piece = total / 16;
+
+  unsigned char dummybuf[piece];
+  memset(dummybuf, 0x00, sizeof(dummybuf));
+  for (unsigned int i=0; i<total/piece; i++){
+    fwrite(dummybuf, 1, sizeof(dummybuf), fd_write);
+  }
+
+  fclose(fd_write);
 
 }
 
