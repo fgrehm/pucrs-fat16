@@ -59,6 +59,7 @@ class FileSystem {
 
     // auxiliary operations
     int find_free_rootdir() const;
+    bool has_in_rootdir(const std::string&) const;
 
     void dumpfat();
     bool readblock(void*, const unsigned int) const;

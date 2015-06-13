@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <string.h>
 
 #include "utils.h"
 
@@ -101,3 +102,14 @@ std::string join(const std::vector<std::string> &vec, std::string delim) {
   }
   return ss.str();
 }
+
+std::string fmt_ascii7_to_stdstr(const unsigned char *cstr){
+  const char *cast = (const char*)cstr;
+  std::string ret = cast;
+  return ret;
+}
+
+void write_fmt_char8_into_uchar8(unsigned char *dest, const char *orig){
+  strcpy((char*)dest, orig); 
+}
+

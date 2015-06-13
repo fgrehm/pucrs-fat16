@@ -83,22 +83,36 @@ int FileSystem::load(){
 
 int FileSystem::makedir(const std::string &path){
   CHECK_INIT 
-
+#if 0
   std::vector<std::string> ret = tokenize_path(path);
 
-  for (unsigned int i=0; i<ret.size(); i++){
+  if (ret.size() == 1){
 
-    int const rid = find_free_rootdir();
-    if (rid == -1){
-      return RET_ROOTDIR_FULL;
+    // this belongs into the root dir
+    if (has_in_rootdir(ret[0])){
+      return RET_DIR_ALREADY_EXISTS; 
     }
 
+  } else {
+
+    //we'll have to find its parent
+
+  }
+
+  for (unsigned int i=0; i<ret.size(); i++){
+    std::cout << ret[i] << std::endl;
     if (i==0){ // root dir
+
+      int const rid = find_free_rootdir();
+      if (rid == -1){
+        return RET_ROOTDIR_FULL;
+      }
+
     } else {
     }
 
   }
-
+#endif
   return RET_OK;
 }
 
@@ -141,15 +155,6 @@ int FileSystem::read(const std::string &path, std::string &content){
 
   (void)path;
   (void)content;
-  return -1;
-}
-
-int FileSystem::find_free_rootdir() const {
-  for (unsigned int i=0; i<sizeof(rootdir); i++){
-    if (rootdir[i].filename[0] == 0x00){
-      return i;
-    }
-  }
   return -1;
 }
 
@@ -232,5 +237,26 @@ void FileSystem::dumpfat() {
   for (unsigned int i=0; i<8; i++){
     writeblock(&(fat[i*1024]), (i+1)*1024);
   }
+}
+
+bool FileSystem::has_in_rootdir(const std::string &dir) const {
+  for (unsigned int i=0; i<sizeof(rootdir); i++){
+    if (rootdir[i].filename[0] != 0x00){
+      std::string rd_str = fmt_ascii7_to_stdstr(rootdir[i].filename);
+      if (rd_str == dir){
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+int FileSystem::find_free_rootdir() const {
+  for (unsigned int i=0; i<sizeof(rootdir); i++){
+    if (rootdir[i].filename[0] == 0x00){
+      return i;
+    }
+  }
+  return -1;
 }
 
