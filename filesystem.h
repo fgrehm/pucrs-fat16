@@ -26,7 +26,7 @@ typedef struct {
   unsigned char filename[18];
   unsigned char attributes;
   unsigned char reserved[7];
-  unsigned char first_block;
+  unsigned char first_block[2];
   unsigned char size;
 } dir_entry_t;
 

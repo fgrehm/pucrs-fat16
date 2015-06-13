@@ -83,15 +83,30 @@ int FileSystem::load(){
 
 int FileSystem::makedir(const std::string &path){
   CHECK_INIT 
-#if 0
-  std::vector<std::string> ret = tokenize_path(path);
 
+  std::vector<std::string> ret = tokenize_path(path);
   if (ret.size() == 1){
 
     // this belongs into the root dir
+
+    // lets check if this is a dupe
     if (has_in_rootdir(ret[0])){
       return RET_DIR_ALREADY_EXISTS; 
     }
+
+    // its not a dupe. lets see if we can find a slot for it 
+    int const rid = find_free_rootdir();
+    if (rid == -1){
+      // no space. forget it.
+      return RET_ROOTDIR_FULL;
+    }
+
+    // theres space. lets create it
+    write_fmt_char8_into_uchar8(rootdir[rid].filename, ret[0].c_str());
+    rootdir[rid].attributes = 1;
+    rootdir[rid].first_block[0] = 0xff; // mvtodo: ta certo?
+    rootdir[rid].first_block[1] = 0xff; // mvtodo: ta certo?
+    rootdir[rid].size = 0x1; // mvtodo: nao esta certo, com certeza nao esta
 
   } else {
 
@@ -99,6 +114,7 @@ int FileSystem::makedir(const std::string &path){
 
   }
 
+#if 0
   for (unsigned int i=0; i<ret.size(); i++){
     std::cout << ret[i] << std::endl;
     if (i==0){ // root dir
@@ -240,7 +256,8 @@ void FileSystem::dumpfat() {
 }
 
 bool FileSystem::has_in_rootdir(const std::string &dir) const {
-  for (unsigned int i=0; i<sizeof(rootdir); i++){
+
+  for (unsigned int i=0; i<32; i++){
     if (rootdir[i].filename[0] != 0x00){
       std::string rd_str = fmt_ascii7_to_stdstr(rootdir[i].filename);
       if (rd_str == dir){
@@ -248,11 +265,12 @@ bool FileSystem::has_in_rootdir(const std::string &dir) const {
       }
     }
   }
+
   return false;
 }
 
 int FileSystem::find_free_rootdir() const {
-  for (unsigned int i=0; i<sizeof(rootdir); i++){
+  for (unsigned int i=0; i<32; i++){
     if (rootdir[i].filename[0] == 0x00){
       return i;
     }
