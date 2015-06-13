@@ -34,4 +34,30 @@ T_init_creates_partition_file() {
     $T_fail "Initialization failed"
     return 1
   fi
+
+  [[ -f $PARTITION_FILE ]] || $T_fail "Partition not created"
+}
+
+T_init_recreates_partition_file() {
+  rm -f $PARTITION_FILE
+
+  if ! run "init" > /dev/null; then
+    $T_fail "Initialization failed"
+    return 1
+  fi
+  initial_time=$(stat -c %Y $PARTITION_FILE)
+
+  # This sucks but time precision on my FS is 1second
+  sleep 1.1
+
+  if ! run "init" > /dev/null; then
+    $T_fail "Initialization failed"
+    return 1
+  fi
+
+  new_time=$(stat -c %Y $PARTITION_FILE)
+  [ "${initial_time}" != "${new_time}" ] || $T_fail "Partition not recreated"
+
+  fs_size=$(stat -c %s $PARTITION_FILE)
+  [ $fs_size = '4194304' ] || $T_fail "Partition did not get wiped out"
 }

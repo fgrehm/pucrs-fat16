@@ -23,7 +23,7 @@ class ExitCommand : public Command {
   public:
     ExitCommand(const std::string &n, const std::string& o) : Command(n, o) {}
 
-    void run(const FileSystem&) {
+    void run(FileSystem&) {
       exit(0);
     }
 };
@@ -32,8 +32,9 @@ class InitCommand : public Command {
   public:
     InitCommand(const std::string &n, const std::string& o) : Command(n, o) {}
 
-    void run(const FileSystem&) {
+    void run(FileSystem& fs) {
       std::cout << "=> Formating partition..." << std::endl;
+      fs.init();
       std::cout << "=> DONE" << std::endl;
     }
 };
@@ -42,7 +43,7 @@ class LoadCommand : public Command {
   public:
     LoadCommand(const std::string &n, const std::string& o) : Command(n, o) {}
 
-    void run(const FileSystem&) {
+    void run(FileSystem&) {
       std::cout << "=> Loading partition table..." << std::endl;
       std::cout << "=> DONE" << std::endl;
     }
@@ -104,7 +105,7 @@ bool Command::validate() {
   return true;
 }
 
-void Command::run(const FileSystem&) {
+void Command::run(FileSystem&) {
   std::cout << " => Will execute: '" << name << "'" << std::endl;
   std::cout << "    -> Arguments provided: ";
   if (opts.size() > 0) {

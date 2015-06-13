@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 #include "utils.h"
 
@@ -18,6 +19,17 @@ void debug(const std::string& msg) {
 #ifdef DEBUG
   std::cout << "[DEBUG] " << msg << std::endl;
 #endif
+}
+
+bool file_exists(const std::string& path) {
+  struct stat fileStat;
+  if (stat(path.c_str(), &fileStat)) {
+    return false;
+  }
+  if (!S_ISREG(fileStat.st_mode)) {
+    return false;
+  }
+  return true;
 }
 
 // Trim from both ends

@@ -14,7 +14,7 @@ class Command {
     virtual ~Command();
 
     virtual bool validate();
-    virtual void run(const FileSystem&);
+    virtual void run(FileSystem&);
 
     std::string name;
     std::string error_message;

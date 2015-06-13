@@ -13,5 +13,6 @@ std::vector<std::string> split(const std::string&, char);
 std::string join(const std::vector<std::string>&, std::string);
 std::string get_env(const std::string&);
 void debug(const std::string&);
+bool file_exists (const std::string& name);
 
 #endif

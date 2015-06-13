@@ -1,11 +1,10 @@
+#include <iostream>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "filesystem.h"
 #include "utils.h"
-
-#include <iostream>
-
-#include <stdio.h>
-#include <string.h>
 
 FileSystem::FileSystem(const std::string &partfname):part_filename(partfname){
 }
@@ -23,8 +22,10 @@ void FileSystem::debug(){
 }
 
 int FileSystem::init(){
-
-  // mvtodo: remove fat.part before "formatting"
+  if (file_exists(part_filename) && remove(part_filename.c_str()) !=0) {
+    std::cout << "Remove operation failed" << std::endl;
+    exit(1);
+  }
 
   // step 1: writeout 1024 0xbb's
   unsigned char bootblock[1024];
