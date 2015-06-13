@@ -2,8 +2,16 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <stdlib.h>
 
 #include "utils.h"
+
+std::string get_env(const std::string &var) {
+  char *char_str = getenv(var.c_str());
+  if (char_str == NULL)
+    return "";
+  return std::string(char_str);
+}
 
 void debug(const std::string& msg) {
   (void)msg; // Mute warnings
