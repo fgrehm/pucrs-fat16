@@ -64,7 +64,24 @@ class MakeDirCommand : public Command {
     void run(FileSystem& fs) {
       (void)fs;
       debug("Will create dir `" + opts[0] + "`");
-      // TODO: fs.listdir(opts[0], filesout);
+      // TODO: fs.mkdir(opts[0]);
+    }
+};
+
+class CreateCommand : public Command {
+  public:
+    CreateCommand(const std::string &n, const std::string& o) : Command(n, o) {
+      help_text = "USAGE: `create /path/to/file`";
+    }
+
+    bool validate() {
+      return opts.size() == 1;
+    }
+
+    void run(FileSystem& fs) {
+      (void)fs;
+      debug("Will create file `" + opts[0] + "`");
+      // TODO: fs.createfile(opts[0], filesout);
     }
 };
 
@@ -114,9 +131,11 @@ Command *Command::parse(const std::string& input) {
   if (cmd_name == "mkdir")
     return new MakeDirCommand(cmd_name, raw_opts);
 
+  if (cmd_name == "create")
+    return new CreateCommand(cmd_name, raw_opts);
+
   // fgtodo: Criar as classes apropriadas para cada comando
-  bool valid_command = cmd_name == "create" \
-                       || cmd_name == "unlink" \
+  bool valid_command = cmd_name == "unlink" \
                        || cmd_name == "write" \
                        || cmd_name == "append" \
                        || cmd_name == "read";

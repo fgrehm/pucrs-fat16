@@ -102,3 +102,23 @@ T_007_ls_lists_dir_contents() {
     return 1
   fi
 }
+
+T_008_create_touches_a_file_on_fs() {
+  rm -f $PARTITION_FILE
+
+  if ! run "init" > /dev/null; then
+    $T_fail "Initialization failed"
+    return 1
+  fi
+
+  if ! run "create" | grep -q '^$ USAGE: `create '; then
+    $T_fail "Did not validate empty path"
+    return 1
+  fi
+
+  # TODO: Write more specs for success behavior
+  if run "create /foo/bar" | grep -q '^$ USAGE: `create '; then
+    $T_fail "Did not recognize the parameter provided"
+    return 1
+  fi
+}
