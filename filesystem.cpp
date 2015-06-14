@@ -30,7 +30,7 @@ void FileSystem::debug(){
     ::debug("Load failed.");
   }
   this->makedir("/home");
-  //this->makedir("/home/box");
+  this->makedir("/home/box");
 
 }
 
@@ -92,7 +92,14 @@ int FileSystem::makedir(const std::string &path){
   }
 
   const unsigned short d_idx = find_free_in_dir(dir_cluster);
-  const unsigned short f_idx = 9; // mvtodo: quem vai dar a fat index?
+  unsigned short f_idx = 0;
+
+  int test_aux = find_free_fat();
+  if (test_aux == -1){
+    return RET_FAT_FULL;
+  } else {
+    f_idx = test_aux;
+  }
 
   fmt_ushort_into_uchar8pair(&(fat[f_idx]), 0xffff);
   fmt_char8_into_uchar8(new_dir_struct.filename, new_dir_name.c_str());
@@ -100,7 +107,10 @@ int FileSystem::makedir(const std::string &path){
   fmt_ushort_into_uchar8pair(new_dir_struct.first_block, f_idx);
   fmt_uint_into_uchar8quad(new_dir_struct.size, 1024);
 
+  memcpy(&dir_cluster[d_idx], &new_dir_struct, sizeof(dir_entry_t));
+
   dumpfat();
+  writeblock(dir_cluster, cluster_offset);
   return RET_OK;
 
 }
