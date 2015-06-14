@@ -84,44 +84,34 @@ int FileSystem::load(){
 int FileSystem::makedir(const std::string &path){
   CHECK_INIT 
 
-  std::vector<std::string> ret = tokenize_path(path);
-  if (ret.size() == 1){
+  dir_entry_t parent = findparent(path);
 
-    // this belongs into the root dir
+  // lets check if this is a dupe
+  /*if (has_in_rootdir(sep_path[0])){
+    return RET_DIR_ALREADY_EXISTS; 
+  }*/
 
-    // lets check if this is a dupe
-    if (has_in_rootdir(ret[0])){
-      return RET_DIR_ALREADY_EXISTS; 
-    }
-
-    // its not a dupe. lets see if we can find a slot for it 
-    int const rid = find_free_rootdir();
-    if (rid == -1){
-      // no space. forget it.
-      return RET_ROOTDIR_FULL;
-    }
-
-    // theres space. lets create it. first, find a slot in the fat
-    int fid = find_free_fat();
-    if (fid == -1){
-      return RET_FS_FULL;
-    }
-
-    // theres space, and fat also has space. add it
-    fmt_ushort_into_uchar8pair(&(fat[fid]), 0xffff);
-    fmt_char8_into_uchar8(rootdir[rid].filename, ret[0].c_str());
-    rootdir[rid].attributes = 1;
-    fmt_ushort_into_uchar8pair(rootdir[rid].first_block, fid);
-    fmt_uint_into_uchar8quad(rootdir[rid].size, 0);
-
-    dumprootdir();
-
-  } else {
-
-    //we'll have to find its parent
-
+  // its not a dupe. lets see if we can find a slot for it 
+  int const rid = find_free_rootdir();
+  if (rid == -1){
+    // no space. forget it.
+    return RET_ROOTDIR_FULL;
   }
 
+  // theres space. lets create it. first, find a slot in the fat
+  int fid = find_free_fat();
+  if (fid == -1){
+    return RET_FS_FULL;
+  }
+
+  // theres space, and fat also has space. add it
+  fmt_ushort_into_uchar8pair(&(fat[fid]), 0xffff);
+  //fmt_char8_into_uchar8(rootdir[rid].filename, sep_path[0].c_str());
+  rootdir[rid].attributes = 1;
+  fmt_ushort_into_uchar8pair(rootdir[rid].first_block, fid);
+  fmt_uint_into_uchar8quad(rootdir[rid].size, 0);
+
+  //mvtodo: dumprootdir();
   dumpfat();
   return RET_OK;
 }
@@ -284,5 +274,21 @@ int FileSystem::find_free_fat() const {
     }
   }
   return -1;
+}
+
+dir_entry_t FileSystem::findparent(const std::string &path){
+  std::vector<std::string> sep_path = tokenize_path(path);
+
+  // first step: determine who is the parent
+  dir_entry_t *parent = 0;
+  for (unsigned int i = 0; i < sep_path.size(); i++){
+    if (i == 0){
+      parent = rootdir;
+    } else {
+      // mvtodo: find who is this bastard's parent
+    }
+  }
+
+  return dir_entry_t(*parent);
 }
 

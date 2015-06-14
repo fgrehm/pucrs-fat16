@@ -95,8 +95,11 @@ class FileSystem {
     int find_free_fat() const;
     bool has_in_rootdir(const std::string&) const;
 
+    dir_entry_t findparent(const std::string&);
+
     void dumpfat();
     void dumprootdir();
+
     bool readblock(void*, const unsigned int) const;
     bool writeblock(const void*, const unsigned int);
     void createdummy() const;

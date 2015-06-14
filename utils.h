@@ -20,5 +20,7 @@ void fmt_ushort_into_uchar8pair(unsigned char*, const unsigned short);
 unsigned short fmt_uchar8pair_to_ushort(const unsigned char*);
 unsigned int fmt_uchar8quad_to_uint(const unsigned char*);
 void fmt_uint_into_uchar8quad(unsigned char *, const unsigned int);
+std::string utils_dirname(const std::string&);
+std::string utils_basename(const std::string&);
 
 #endif

@@ -146,3 +146,19 @@ unsigned int fmt_uchar8quad_to_uint(const unsigned char *orig){
   return ret;
 }
 
+std::string utils_dirname(const std::string &path){
+  std::vector<std::string> ret = tokenize_path(path);
+  if (ret.size() == 1){
+    return "/";
+  }
+  return ret[ret.size()-2];
+}
+
+std::string utils_basename(const std::string &path){
+  std::vector<std::string> ret = tokenize_path(path);
+  if (ret.size() == 1){
+    return "/";
+  }
+  return ret[ret.size()-1];
+}
+
