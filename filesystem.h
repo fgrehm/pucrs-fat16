@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <string>
+#include <string.h>
 
 /* Interface return codes begin */
 #define RET_OK 0
@@ -22,13 +23,45 @@
 
 /* Data structures begin */
 
-typedef struct {
+struct dir_entry_t {
+
+  dir_entry_t():attributes(0x00){
+    clear();
+  }
+
+  dir_entry_t(const dir_entry_t &other):attributes(0x00){
+    copyFrom(other);
+  }
+
+  dir_entry_t& operator=(const dir_entry_t &other){
+    copyFrom(other);
+    return *this;
+  }
+
+  void copyFrom(const dir_entry_t &other){
+    memcpy(this->filename, other.filename, sizeof(this->filename));
+    this->attributes = other.attributes;
+    memcpy(this->reserved, other.reserved, sizeof(this->reserved));
+    memcpy(this->first_block, other.first_block, sizeof(this->first_block));
+    memcpy(this->size, other.size, sizeof(this->size));
+  }
+
+  void clear(){
+    memset(filename, 0x00, sizeof(filename));
+    memset(reserved, 0x00, sizeof(reserved));
+    memset(first_block, 0x00, sizeof(first_block));
+    memset(size, 0x00, sizeof(size));
+  }
+
+  ~dir_entry_t(){}
+
   unsigned char filename[18];
   unsigned char attributes;
   unsigned char reserved[7];
   unsigned char first_block[2];
   unsigned char size[4];
-} dir_entry_t;
+
+};
 
 /* Data structures end */
 
