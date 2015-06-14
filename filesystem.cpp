@@ -112,7 +112,7 @@ int FileSystem::makedir(const std::string &path){
     fmt_char8_into_uchar8(rootdir[rid].filename, ret[0].c_str());
     rootdir[rid].attributes = 1;
     fmt_ushort_into_uchar8pair(rootdir[rid].first_block, fid);
-    fmt_uint_into_uchar8quad(rootdir[rid].size, 1024);
+    fmt_uint_into_uchar8quad(rootdir[rid].size, 0);
 
     dumprootdir();
 
