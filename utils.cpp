@@ -162,3 +162,17 @@ std::string utils_basename(const std::string &path){
   return ret[ret.size()-1];
 }
 
+std::string popleft_path(const std::string &path){
+  std::vector<std::string> aux = tokenize_path(path);
+  if (aux.size() == 1){
+    return aux[0];
+  }
+  std::string ret;
+  for (unsigned int i=1; i<aux.size(); i++){
+    ret += aux[i];
+    ret += "/";
+  }
+  ret = ret.substr(0, ret.size()-1);
+  return ret;
+}
+

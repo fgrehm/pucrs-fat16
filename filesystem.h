@@ -93,11 +93,12 @@ class FileSystem {
   private:
 
     int find_free_fat() const;
-    //int find_free_in_rootdir(const dir_entry_t *) const;
+    int find_free_in_dir(const dir_entry_t *) const;
     //bool has_in_rootdir(const std::string&) const;
 
+    unsigned short traverse_path(const std::string&, const unsigned short);
     dir_entry_t findparent(const std::string&);
-    dir_entry_t findentry(const std::string&, const dir_entry_t&);
+    //dir_entry_t findentry(const std::string&, const dir_entry_t&);
 
     void dumpfat();
     void dumprootdir();

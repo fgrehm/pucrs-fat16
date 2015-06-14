@@ -80,13 +80,7 @@ int FileSystem::load(){
 int FileSystem::makedir(const std::string &path){
   CHECK_INIT 
 
-  // mvdebug begin
-  // so pra poder recompilar
-  //dir_entry_t rootdir[32];
-  //readblock(rootdir, ROOTDIR_OFFSET);
-  // mvdebug end
-
-  /*try {
+ /*try {
     parent = findparent(path);
   } catch (const FSExcept &ex) {
     if (ex.code == RET_NO_SUCH_PARENT){
@@ -111,20 +105,14 @@ int FileSystem::makedir(const std::string &path){
   const std::string new_dir_name = utils_basename(path);
   dir_entry_t new_dir_struct;
 
-  // theres space. lets create it. first, find a slot in the fat
-  int fid = find_free_fat();
-  if (fid == -1){
-    return RET_FS_FULL;
-  }
+  unsigned short loc = traverse_path(path, ROOTDIR_OFFSET);
 
-  // theres space, and fat also has space. add it
-  fmt_ushort_into_uchar8pair(&(fat[fid]), 0xffff);
+  /*fmt_ushort_into_uchar8pair(&(fat[fid]), 0xffff);
   fmt_char8_into_uchar8(new_dir_struct.filename, new_dir_name.c_str());
   new_dir_struct.attributes = 1;
   fmt_ushort_into_uchar8pair(new_dir_struct.first_block, fid);
-  fmt_uint_into_uchar8quad(new_dir_struct.size, 0);
+  fmt_uint_into_uchar8quad(new_dir_struct.size, 1024);*/
 
-  //mvtodo: dumprootdir();
   dumpfat();
   return RET_OK;
 
@@ -261,17 +249,16 @@ void FileSystem::dumpfat() {
   }
 
   return false;
-}
+}*/
 
-int find_free_in_rootdir(const dir_entry_t *) const;
-int FileSystem::find_free_rootdir() const {
+int FileSystem::find_free_in_dir(const dir_entry_t *dir) const{
   for (unsigned int i=0; i<32; i++){
-    if (rootdir[i].filename[0] == 0x00){
+    if (dir[i].filename[0] == 0x00){
       return i;
     }
   }
   return -1;
-}*/
+}
 
 int FileSystem::find_free_fat() const {
   for (unsigned int i=0; i<sizeof(fat)/2; i+=2){
@@ -303,7 +290,25 @@ dir_entry_t FileSystem::findparent(const std::string &path){
   return dir_entry_t(*parent);
 }
 
-dir_entry_t FileSystem::findentry(const std::string &path_basename, const dir_entry_t &parent){
+/*dir_entry_t FileSystem::findentry(const std::string &path_basename, const dir_entry_t &parent){
+}*/
+
+// percorre um path e devolve o cluster que esta o ultimo elemento.
+unsigned short FileSystem::traverse_path(const std::string &path, const unsigned short offset){
+
+  unsigned short ret = -1;
+  std::vector<std::string> path_sep = tokenize_path(path);
+
+  dir_entry_t current[32];
+  readblock(current, offset);
+
+  for (unsigned int i=0; i<path_sep.size(); i++){
+    int stop=1;
+  }
+
+  // writeblock(...)?
+
+  return ret;
 
 }
 
