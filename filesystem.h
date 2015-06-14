@@ -27,7 +27,7 @@ typedef struct {
   unsigned char attributes;
   unsigned char reserved[7];
   unsigned char first_block[2];
-  unsigned char size;
+  unsigned char size[4];
 } dir_entry_t;
 
 /* Data structures end */

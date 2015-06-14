@@ -109,11 +109,10 @@ int FileSystem::makedir(const std::string &path){
 
     // theres space, and fat also has space. add it
     fmt_ushort_into_uchar8pair(&(fat[fid]), 0xffff);
-
     fmt_char8_into_uchar8(rootdir[rid].filename, ret[0].c_str());
     rootdir[rid].attributes = 1;
     fmt_ushort_into_uchar8pair(rootdir[rid].first_block, fid);
-    rootdir[rid].size = 0x1; // mvtodo: isto nao deve estar muito certo
+    fmt_uint_into_uchar8quad(rootdir[rid].size, 1024);
 
   } else {
 
@@ -121,21 +120,6 @@ int FileSystem::makedir(const std::string &path){
 
   }
 
-#if 0
-  for (unsigned int i=0; i<ret.size(); i++){
-    std::cout << ret[i] << std::endl;
-    if (i==0){ // root dir
-
-      int const rid = find_free_rootdir();
-      if (rid == -1){
-        return RET_ROOTDIR_FULL;
-      }
-
-    } else {
-    }
-
-  }
-#endif
   return RET_OK;
 }
 

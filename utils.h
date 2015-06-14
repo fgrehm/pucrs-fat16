@@ -18,5 +18,7 @@ std::string fmt_ascii7_to_stdstr(const unsigned char *);
 void fmt_char8_into_uchar8(unsigned char*, const char *);
 void fmt_ushort_into_uchar8pair(unsigned char*, const unsigned short);
 unsigned short fmt_uchar8pair_to_ushort(const unsigned char*);
+unsigned int fmt_uchar8quad_to_uint(const unsigned char*);
+void fmt_uint_into_uchar8quad(unsigned char *, const unsigned int);
 
 #endif

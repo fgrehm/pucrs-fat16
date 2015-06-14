@@ -121,11 +121,28 @@ void fmt_ushort_into_uchar8pair(unsigned char *dest, const unsigned short orig){
 
 unsigned short fmt_uchar8pair_to_ushort(const unsigned char *orig){
   unsigned short ret = 0;
-  unsigned char hi = (*orig);
-  unsigned char lo = (*(orig+1));
-  ret = hi;
+  ret = *(orig);
   ret <<= 8;
-  ret += lo;
+  ret += *(orig+1);
+  return ret;
+}
+
+void fmt_uint_into_uchar8quad(unsigned char *dest, const unsigned int orig){
+  *dest = (orig >> 24) & 0xff;
+  *(dest+1) = (orig >> 16) & 0xff;
+  *(dest+2) = (orig >> 8) & 0xff;
+  *(dest+3) = orig & 0xff;
+}
+
+unsigned int fmt_uchar8quad_to_uint(const unsigned char *orig){
+  unsigned int ret = 0;
+  ret = *(orig);
+  ret <<= 8;
+  ret += *(orig+1);
+  ret <<= 8;
+  ret += *(orig+2);
+  ret <<= 8;
+  ret += *(orig+3);
   return ret;
 }
 
