@@ -80,38 +80,24 @@ int FileSystem::load(){
 int FileSystem::makedir(const std::string &path){
   CHECK_INIT 
 
- /*try {
-    parent = findparent(path);
-  } catch (const FSExcept &ex) {
-    if (ex.code == RET_NO_SUCH_PARENT){
-      // no such parent. error. this aint no mkdir -p
-      ::debug("Asked to makedir but cannot find parent");
-      return RET_NO_SUCH_PARENT;
-    }
-  }*/
-
-  // lets check if this is a dupe
-  /*if (has_in_rootdir(sep_path[0])){
-    return RET_DIR_ALREADY_EXISTS; 
-  }*/
-
-  // its not a dupe. lets see if we can find a slot for it 
-  /*int const rid = find_free_rootdir();
-  if (rid == -1){
-    // no space. forget it.
-    return RET_ROOTDIR_FULL;
-  }*/
-
   const std::string new_dir_name = utils_basename(path);
   dir_entry_t new_dir_struct;
 
-  unsigned short loc = traverse_path(path, ROOTDIR_OFFSET);
+  unsigned short cluster_offset = traverse_path(path, ROOTDIR_OFFSET);
+  dir_entry_t dir_cluster[32];
+  readblock(dir_cluster, cluster_offset);
+ 
+  if (has_in_dir(new_dir_name, dir_cluster)){
+    return RET_DIR_ALREADY_EXISTS;
+  }
 
-  /*fmt_ushort_into_uchar8pair(&(fat[fid]), 0xffff);
+  unsigned short d_idx = find_free_in_dir(dir_cluster);
+
+  //fmt_ushort_into_uchar8pair(&(fat[fid]), 0xffff);
   fmt_char8_into_uchar8(new_dir_struct.filename, new_dir_name.c_str());
   new_dir_struct.attributes = 1;
-  fmt_ushort_into_uchar8pair(new_dir_struct.first_block, fid);
-  fmt_uint_into_uchar8quad(new_dir_struct.size, 1024);*/
+  //fmt_ushort_into_uchar8pair(new_dir_struct.first_block, fid);
+  fmt_uint_into_uchar8quad(new_dir_struct.size, 1024);
 
   dumpfat();
   return RET_OK;
@@ -237,19 +223,19 @@ void FileSystem::dumpfat() {
   }
 }
 
-/*bool FileSystem::has_in_rootdir(const std::string &dir) const {
+bool FileSystem::has_in_dir(const std::string &name, const dir_entry_t *dir) const {
 
   for (unsigned int i=0; i<32; i++){
-    if (rootdir[i].filename[0] != 0x00){
-      std::string rd_str = fmt_ascii7_to_stdstr(rootdir[i].filename);
-      if (rd_str == dir){
+    if (dir[i].filename[0] != 0x00){
+      std::string rd_str = fmt_ascii7_to_stdstr(dir[i].filename);
+      if (rd_str == name){
         return true;
       }
     }
   }
 
   return false;
-}*/
+}
 
 int FileSystem::find_free_in_dir(const dir_entry_t *dir) const{
   for (unsigned int i=0; i<32; i++){
@@ -269,41 +255,21 @@ int FileSystem::find_free_fat() const {
   return -1;
 }
 
-dir_entry_t FileSystem::findparent(const std::string &path){
-  std::vector<std::string> sep_path = tokenize_path(path);
-
-  //dir_entry_t *parent = rootdir;
-  dir_entry_t *parent = 0;
-  for (unsigned int i = 0; i < sep_path.size(); i++){
-    if (i == sep_path.size()-1) {
-      break;
-    }
-
-    
-
-  }
-
-  if (parent == 0){
-    throw FSExcept("Parent cannot be found", RET_NO_SUCH_PARENT);
-  }
-
-  return dir_entry_t(*parent);
-}
-
-/*dir_entry_t FileSystem::findentry(const std::string &path_basename, const dir_entry_t &parent){
-}*/
-
 // percorre um path e devolve o cluster que esta o ultimo elemento.
 unsigned short FileSystem::traverse_path(const std::string &path, const unsigned short offset){
 
   unsigned short ret = -1;
   std::vector<std::string> path_sep = tokenize_path(path);
+  std::string next = popleft_path(path);
 
-  dir_entry_t current[32];
-  readblock(current, offset);
+  if (path_sep.size() == 1){
+    return offset;
+  }
+
+  /*dir_entry_t current[32];
+  readblock(current, offset);*/
 
   for (unsigned int i=0; i<path_sep.size(); i++){
-    int stop=1;
   }
 
   // writeblock(...)?
