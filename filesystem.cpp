@@ -7,9 +7,13 @@
 #include "utils.h"
 #include "fsexcept.h"
 
+#define BOOT_OFFSET       0*1024
+#define FAT_OFFSET        1*1024
+#define ROOTDIR_OFFSET    9*1024
+#define DATA_OFFSET       10*1024
+
 FileSystem::FileSystem(const std::string &partfname):part_filename(partfname), initialized(false){
   memset(fat, 0x00, sizeof(fat));
-  memset(rootdir, 0x00, sizeof(rootdir));
 }
 
 FileSystem::~FileSystem(){
@@ -26,7 +30,7 @@ void FileSystem::debug(){
     ::debug("Load failed.");
   }
   this->makedir("/home");
-  this->makedir("/home/box");
+  //this->makedir("/home/box");
 
 }
 
@@ -38,9 +42,7 @@ int FileSystem::init(){
   // step 1: writeout 1024 0xbb's
   unsigned char bootblock[1024];
   memset(bootblock, 0xbb, sizeof(bootblock));
-  if (!writeblock(bootblock, 0)){
-    return RET_CANNOT_INITIALIZE;
-  }
+  writeblock(bootblock, 0);
 
   // step 2: writeout the fat "header"
   unsigned char fatheader[8192] = {0xff, 0xfd,
@@ -56,28 +58,21 @@ int FileSystem::init(){
 
   memset(fatheader+20, 0x00, sizeof(fatheader)-20);
   for (unsigned int i=0; i<8; i++){
-    if (!writeblock(&(fatheader[i*1024]), (i+1)*1024)){
-      return RET_CANNOT_INITIALIZE;
-    }
+    writeblock(&(fatheader[i*1024]), (i+1)*1024);
   }
 
   // step 3: we no longer have to writeout the blank rest because we now have a whole blankened dummy file from the beginning
 
-  initialized = true;
   return RET_OK;
 }
 
 int FileSystem::load(){
-  CHECK_INIT 
 
   for (unsigned int i=0; i<8; i++){
-
-    if (!readblock(&(fat[i*1024]), (i+1) * 1024)){
-      return RET_CANNOT_INITIALIZE;
-    }
-
+    readblock(&(fat[i*1024]), (i+1) * 1024);
   }
 
+  initialized = true;
   return RET_OK;
 
 }
@@ -85,9 +80,13 @@ int FileSystem::load(){
 int FileSystem::makedir(const std::string &path){
   CHECK_INIT 
 
-  dir_entry_t parent;
+  // mvdebug begin
+  // so pra poder recompilar
+  //dir_entry_t rootdir[32];
+  //readblock(rootdir, ROOTDIR_OFFSET);
+  // mvdebug end
 
-  try {
+  /*try {
     parent = findparent(path);
   } catch (const FSExcept &ex) {
     if (ex.code == RET_NO_SUCH_PARENT){
@@ -95,7 +94,7 @@ int FileSystem::makedir(const std::string &path){
       ::debug("Asked to makedir but cannot find parent");
       return RET_NO_SUCH_PARENT;
     }
-  }
+  }*/
 
   // lets check if this is a dupe
   /*if (has_in_rootdir(sep_path[0])){
@@ -103,11 +102,14 @@ int FileSystem::makedir(const std::string &path){
   }*/
 
   // its not a dupe. lets see if we can find a slot for it 
-  int const rid = find_free_rootdir();
+  /*int const rid = find_free_rootdir();
   if (rid == -1){
     // no space. forget it.
     return RET_ROOTDIR_FULL;
-  }
+  }*/
+
+  const std::string new_dir_name = utils_basename(path);
+  dir_entry_t new_dir_struct;
 
   // theres space. lets create it. first, find a slot in the fat
   int fid = find_free_fat();
@@ -117,14 +119,15 @@ int FileSystem::makedir(const std::string &path){
 
   // theres space, and fat also has space. add it
   fmt_ushort_into_uchar8pair(&(fat[fid]), 0xffff);
-  //fmt_char8_into_uchar8(rootdir[rid].filename, sep_path[0].c_str());
-  rootdir[rid].attributes = 1;
-  fmt_ushort_into_uchar8pair(rootdir[rid].first_block, fid);
-  fmt_uint_into_uchar8quad(rootdir[rid].size, 0);
+  fmt_char8_into_uchar8(new_dir_struct.filename, new_dir_name.c_str());
+  new_dir_struct.attributes = 1;
+  fmt_ushort_into_uchar8pair(new_dir_struct.first_block, fid);
+  fmt_uint_into_uchar8quad(new_dir_struct.size, 0);
 
   //mvtodo: dumprootdir();
   dumpfat();
   return RET_OK;
+
 }
 
 int FileSystem::listdir(const std::string &path, std::vector<std::string> &result){
@@ -169,21 +172,19 @@ int FileSystem::read(const std::string &path, std::string &content){
   return -1;
 }
 
-bool FileSystem::readblock(void *into, const unsigned int offset) const {
+void FileSystem::readblock(void *into, const unsigned int offset) const {
 
   FILE* fd = fopen(part_filename.c_str(), "rb");
   if (fd == NULL){
-    return false;
+    throw FSExcept("Cannot open for reading", RET_INTERNAL_ERROR);
   }
   fseek(fd, offset, SEEK_SET);
   fread(into, 1, 1024, fd);
   fclose(fd);
 
-  return true;
-
 }
 
-bool FileSystem::writeblock(const void * buf, const unsigned int offset){
+void FileSystem::writeblock(const void * buf, const unsigned int offset){
 
   // we have to read and overwrite the whole file :S 
   unsigned char *wholebuffer = 0;
@@ -192,7 +193,7 @@ bool FileSystem::writeblock(const void * buf, const unsigned int offset){
   // open up partition file
   FILE* fd_read = fopen(part_filename.c_str(), "rb");
   if (fd_read == NULL){
-    return false;
+    throw FSExcept("Cannot open for reading.", RET_INTERNAL_ERROR);
   }
 
   // get its filesize
@@ -212,15 +213,13 @@ bool FileSystem::writeblock(const void * buf, const unsigned int offset){
   // and finally write the whole thing back
   FILE* fd_write = fopen(part_filename.c_str(), "wb");
   if (fd_write == NULL){
-    return false;
+    throw FSExcept("Cannot open for writing.", RET_INTERNAL_ERROR);
   }
 
   // write, close, dealloc.. clenaup code.
   fwrite(wholebuffer, 1, fsize, fd_write);
   fclose(fd_write);
   free(wholebuffer);
-
-  return true;
 
 }
 
@@ -250,11 +249,7 @@ void FileSystem::dumpfat() {
   }
 }
 
-void FileSystem::dumprootdir() {
-  writeblock(rootdir, 9*1024);
-}
-
-bool FileSystem::has_in_rootdir(const std::string &dir) const {
+/*bool FileSystem::has_in_rootdir(const std::string &dir) const {
 
   for (unsigned int i=0; i<32; i++){
     if (rootdir[i].filename[0] != 0x00){
@@ -268,6 +263,7 @@ bool FileSystem::has_in_rootdir(const std::string &dir) const {
   return false;
 }
 
+int find_free_in_rootdir(const dir_entry_t *) const;
 int FileSystem::find_free_rootdir() const {
   for (unsigned int i=0; i<32; i++){
     if (rootdir[i].filename[0] == 0x00){
@@ -275,8 +271,7 @@ int FileSystem::find_free_rootdir() const {
     }
   }
   return -1;
-}
-
+}*/
 
 int FileSystem::find_free_fat() const {
   for (unsigned int i=0; i<sizeof(fat)/2; i+=2){
@@ -290,21 +285,25 @@ int FileSystem::find_free_fat() const {
 dir_entry_t FileSystem::findparent(const std::string &path){
   std::vector<std::string> sep_path = tokenize_path(path);
 
-  // first step: determine who is the parent
+  //dir_entry_t *parent = rootdir;
   dir_entry_t *parent = 0;
   for (unsigned int i = 0; i < sep_path.size(); i++){
-    if (i == 0){
-      parent = rootdir;
-    } else {
-      // mvtodo: find who is this bastard's parent
+    if (i == sep_path.size()-1) {
+      break;
     }
+
+    
+
   }
 
   if (parent == 0){
-    // mvtodo: raise hell!
     throw FSExcept("Parent cannot be found", RET_NO_SUCH_PARENT);
   }
 
   return dir_entry_t(*parent);
+}
+
+dir_entry_t FileSystem::findentry(const std::string &path_basename, const dir_entry_t &parent){
+
 }
 

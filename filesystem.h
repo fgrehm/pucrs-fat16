@@ -18,6 +18,7 @@
 #define RET_ROOTDIR_FULL 8
 #define RET_NOT_INITIALIZED 9
 #define RET_NO_SUCH_PARENT 10
+#define RET_INTERNAL_ERROR 11
 /* Interface return codes end */
 
 #define CHECK_INIT if (!initialized) {return RET_NOT_INITIALIZED;}
@@ -91,23 +92,22 @@ class FileSystem {
 
   private:
 
-    // auxiliary operations
-    int find_free_rootdir() const;
     int find_free_fat() const;
-    bool has_in_rootdir(const std::string&) const;
+    //int find_free_in_rootdir(const dir_entry_t *) const;
+    //bool has_in_rootdir(const std::string&) const;
 
     dir_entry_t findparent(const std::string&);
+    dir_entry_t findentry(const std::string&, const dir_entry_t&);
 
     void dumpfat();
     void dumprootdir();
 
-    bool readblock(void*, const unsigned int) const;
-    bool writeblock(const void*, const unsigned int);
+    void readblock(void*, const unsigned int) const;
+    void writeblock(const void*, const unsigned int);
     void createdummy() const;
 
     const std::string part_filename;
     unsigned char fat[8192];
-    dir_entry_t rootdir[32];
 
     bool initialized;
 

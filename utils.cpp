@@ -157,7 +157,7 @@ std::string utils_dirname(const std::string &path){
 std::string utils_basename(const std::string &path){
   std::vector<std::string> ret = tokenize_path(path);
   if (ret.size() == 1){
-    return "/";
+    return ret[0];
   }
   return ret[ret.size()-1];
 }
