@@ -91,12 +91,13 @@ int FileSystem::makedir(const std::string &path){
     return RET_DIR_ALREADY_EXISTS;
   }
 
-  unsigned short d_idx = find_free_in_dir(dir_cluster);
+  const unsigned short d_idx = find_free_in_dir(dir_cluster);
+  const unsigned short f_idx = 9; // mvtodo: quem vai dar a fat index?
 
-  //fmt_ushort_into_uchar8pair(&(fat[fid]), 0xffff);
+  fmt_ushort_into_uchar8pair(&(fat[f_idx]), 0xffff);
   fmt_char8_into_uchar8(new_dir_struct.filename, new_dir_name.c_str());
   new_dir_struct.attributes = 1;
-  //fmt_ushort_into_uchar8pair(new_dir_struct.first_block, fid);
+  fmt_ushort_into_uchar8pair(new_dir_struct.first_block, f_idx);
   fmt_uint_into_uchar8quad(new_dir_struct.size, 1024);
 
   dumpfat();
