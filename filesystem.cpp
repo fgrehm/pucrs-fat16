@@ -5,6 +5,7 @@
 
 #include "filesystem.h"
 #include "utils.h"
+#include "fsexcept.h"
 
 FileSystem::FileSystem(const std::string &partfname):part_filename(partfname), initialized(false){
   memset(fat, 0x00, sizeof(fat));
@@ -84,7 +85,17 @@ int FileSystem::load(){
 int FileSystem::makedir(const std::string &path){
   CHECK_INIT 
 
-  dir_entry_t parent = findparent(path);
+  dir_entry_t parent;
+
+  try {
+    parent = findparent(path);
+  } catch (const FSExcept &ex) {
+    if (ex.code == RET_NO_SUCH_PARENT){
+      // no such parent. error. this aint no mkdir -p
+      ::debug("Asked to makedir but cannot find parent");
+      return RET_NO_SUCH_PARENT;
+    }
+  }
 
   // lets check if this is a dupe
   /*if (has_in_rootdir(sep_path[0])){
@@ -287,6 +298,11 @@ dir_entry_t FileSystem::findparent(const std::string &path){
     } else {
       // mvtodo: find who is this bastard's parent
     }
+  }
+
+  if (parent == 0){
+    // mvtodo: raise hell!
+    throw FSExcept("Parent cannot be found", RET_NO_SUCH_PARENT);
   }
 
   return dir_entry_t(*parent);

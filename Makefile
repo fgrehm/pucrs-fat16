@@ -2,7 +2,7 @@
 
 TESTAPPNAME=pucrs-fat16
 
-SRC=main.cpp utils.cpp console.cpp filesystem.cpp command.cpp
+SRC=main.cpp utils.cpp console.cpp filesystem.cpp command.cpp fsexcept.cpp
 OBJ=$(SRC:.cpp=.o)
 
 ARCH := $(shell getconf LONG_BIT)

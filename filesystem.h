@@ -17,6 +17,7 @@
 #define RET_CANNOT_INITIALIZE 7
 #define RET_ROOTDIR_FULL 8
 #define RET_NOT_INITIALIZED 9
+#define RET_NO_SUCH_PARENT 10
 /* Interface return codes end */
 
 #define CHECK_INIT if (!initialized) {return RET_NOT_INITIALIZED;}
