@@ -109,7 +109,23 @@ std::string fmt_ascii7_to_stdstr(const unsigned char *cstr){
   return ret;
 }
 
-void write_fmt_char8_into_uchar8(unsigned char *dest, const char *orig){
+void fmt_char8_into_uchar8(unsigned char *dest, const char *orig){
   strcpy((char*)dest, orig); 
+}
+
+void fmt_ushort_into_uchar8pair(unsigned char *dest, const unsigned short orig){
+  *dest = (orig >> 8) & 0xff;
+  *(dest+1) = orig & 0xff;
+}
+
+
+unsigned short fmt_uchar8pair_to_ushort(const unsigned char *orig){
+  unsigned short ret = 0;
+  unsigned char hi = (*orig);
+  unsigned char lo = (*(orig+1));
+  ret = hi;
+  ret <<= 8;
+  ret += lo;
+  return ret;
 }
 

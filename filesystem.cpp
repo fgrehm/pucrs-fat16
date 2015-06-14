@@ -101,12 +101,19 @@ int FileSystem::makedir(const std::string &path){
       return RET_ROOTDIR_FULL;
     }
 
-    // theres space. lets create it
-    write_fmt_char8_into_uchar8(rootdir[rid].filename, ret[0].c_str());
+    // theres space. lets create it. first, find a slot in the fat
+    int fid = find_free_fat();
+    if (fid == -1){
+      return RET_FS_FULL;
+    }
+
+    // theres space, and fat also has space. add it
+    fmt_ushort_into_uchar8pair(&(fat[fid]), 0xffff);
+
+    fmt_char8_into_uchar8(rootdir[rid].filename, ret[0].c_str());
     rootdir[rid].attributes = 1;
-    rootdir[rid].first_block[0] = 0xff; // mvtodo: ta certo?
-    rootdir[rid].first_block[1] = 0xff; // mvtodo: ta certo?
-    rootdir[rid].size = 0x1; // mvtodo: nao esta certo, com certeza nao esta
+    fmt_ushort_into_uchar8pair(rootdir[rid].first_block, fid);
+    rootdir[rid].size = 0x1; // mvtodo: isto nao deve estar muito certo
 
   } else {
 
@@ -272,6 +279,16 @@ bool FileSystem::has_in_rootdir(const std::string &dir) const {
 int FileSystem::find_free_rootdir() const {
   for (unsigned int i=0; i<32; i++){
     if (rootdir[i].filename[0] == 0x00){
+      return i;
+    }
+  }
+  return -1;
+}
+
+
+int FileSystem::find_free_fat() const {
+  for (unsigned int i=0; i<sizeof(fat)/2; i+=2){
+    if (fat[i] == 0x00){
       return i;
     }
   }

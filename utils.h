@@ -15,6 +15,8 @@ std::string get_env(const std::string&);
 void debug(const std::string&);
 bool file_exists (const std::string& name);
 std::string fmt_ascii7_to_stdstr(const unsigned char *);
-void write_fmt_char8_into_uchar8(unsigned char*, const char *);
+void fmt_char8_into_uchar8(unsigned char*, const char *);
+void fmt_ushort_into_uchar8pair(unsigned char*, const unsigned short);
+unsigned short fmt_uchar8pair_to_ushort(const unsigned char*);
 
 #endif

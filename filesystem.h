@@ -59,6 +59,7 @@ class FileSystem {
 
     // auxiliary operations
     int find_free_rootdir() const;
+    int find_free_fat() const;
     bool has_in_rootdir(const std::string&) const;
 
     void dumpfat();
