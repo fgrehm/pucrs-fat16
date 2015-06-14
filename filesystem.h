@@ -63,13 +63,13 @@ class FileSystem {
     bool has_in_rootdir(const std::string&) const;
 
     void dumpfat();
+    void dumprootdir();
     bool readblock(void*, const unsigned int) const;
     bool writeblock(const void*, const unsigned int);
     void createdummy() const;
 
     const std::string part_filename;
     unsigned char fat[8192];
-    unsigned char datablocks[1024];
     dir_entry_t rootdir[32];
 
     bool initialized;

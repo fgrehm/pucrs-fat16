@@ -8,7 +8,6 @@
 
 FileSystem::FileSystem(const std::string &partfname):part_filename(partfname), initialized(false){
   memset(fat, 0x00, sizeof(fat));
-  memset(datablocks, 0x00, sizeof(datablocks));
   memset(rootdir, 0x00, sizeof(rootdir));
 }
 
@@ -26,6 +25,7 @@ void FileSystem::debug(){
     ::debug("Load failed.");
   }
   this->makedir("/home");
+  this->makedir("/home/box");
 
 }
 
@@ -114,12 +114,15 @@ int FileSystem::makedir(const std::string &path){
     fmt_ushort_into_uchar8pair(rootdir[rid].first_block, fid);
     fmt_uint_into_uchar8quad(rootdir[rid].size, 1024);
 
+    dumprootdir();
+
   } else {
 
     //we'll have to find its parent
 
   }
 
+  dumpfat();
   return RET_OK;
 }
 
@@ -244,6 +247,10 @@ void FileSystem::dumpfat() {
   for (unsigned int i=0; i<8; i++){
     writeblock(&(fat[i*1024]), (i+1)*1024);
   }
+}
+
+void FileSystem::dumprootdir() {
+  writeblock(rootdir, 9*1024);
 }
 
 bool FileSystem::has_in_rootdir(const std::string &dir) const {
