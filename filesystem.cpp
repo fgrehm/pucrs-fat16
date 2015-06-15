@@ -140,17 +140,24 @@ int FileSystem::listdir(const std::string &path, std::vector<std::string> &resul
   dir_entry_t dir_cluster[32];
   unsigned short cluster_offset = 0;
 
-  std::string banzai = path;
-  banzai += "/xoxoxo";
-  int cof_i = traverse_path(banzai, ROOTDIR_OFFSET); // BANZAI!!!!!!
-  if (cof_i == -1){
-      std::string aux = "Could not follow path: ";
-      aux += path;
-      throw FSExcept(aux, RET_INTERNAL_ERROR);
-  } else{
-    cluster_offset = cof_i;
+  if (path == "/"){
+    cluster_offset = ROOTDIR_OFFSET;
+    readblock(dir_cluster, ROOTDIR_OFFSET);
+  } else {
+
+    std::string banzai = path;
+    banzai += "/xoxoxo";
+    int cof_i = traverse_path(banzai, ROOTDIR_OFFSET); // BANZAI!!!!!!
+    if (cof_i == -1){
+        std::string aux = "Could not follow path: ";
+        aux += path;
+        throw FSExcept(aux, RET_INTERNAL_ERROR);
+    } else{
+      cluster_offset = cof_i;
+    }
+    readblock(dir_cluster, cluster_offset);
+
   }
-  readblock(dir_cluster, cluster_offset);
 
   std::vector<std::string> ret;
   for (unsigned int i=0; i<32; i++){
