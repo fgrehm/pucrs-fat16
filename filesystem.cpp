@@ -374,6 +374,9 @@ void FileSystem::createdummy() const {
 }
 
 void FileSystem::dumpfat() {
+  if (!initialized)
+    return;
+
   for (unsigned int i=0; i<8; i++){
     writeblock(&(fat[i*1024]), (i+1)*1024);
   }
