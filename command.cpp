@@ -176,7 +176,7 @@ class UnlinkCommand : public Command {
 class WriteCommand : public Command {
   public:
     WriteCommand(const std::string &n, const std::string& o) : Command(n, o) {
-      help_text = "USAGE: `write \"contents-to\" /path/to/file`";
+      help_text = "USAGE: `write contents-to /path/to/file`";
     }
 
     bool validate() {
@@ -184,9 +184,16 @@ class WriteCommand : public Command {
     }
 
     void run(FileSystem& fs) {
-      (void)fs;
-      debug("Will write \"" + opts[0] + "\" to `" + opts[1] + "`");
-      // TODO: fs.listdir(opts[0], filesout);
+      try {
+        int result = fs.write(opts[1], opts[0]);
+        if (result == RET_NOT_INITIALIZED) {
+          std::cout << "[ERROR] Filesystem not loaded!" << std::endl;
+        } else if (result != RET_OK) {
+          print_exception("Error unlinking", result);
+        }
+      } catch(FSExcept &e) {
+        print_exception("Error unlinking: " + e.message, e.code);
+      }
     }
 };
 
