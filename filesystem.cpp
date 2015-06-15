@@ -93,7 +93,7 @@ int FileSystem::load(){
 }
 
 int FileSystem::makedir(const std::string &path){
-  CHECK_INIT 
+  CHECK_INIT
 
   dir_entry_t new_dir_struct;
   dir_entry_t dir_cluster[32];
@@ -140,7 +140,7 @@ int FileSystem::makedir(const std::string &path){
 }
 
 int FileSystem::listdir(const std::string &path, std::vector<std::string> &result){
-  CHECK_INIT 
+  CHECK_INIT
 
   dir_entry_t dir_cluster[32];
   unsigned short cluster_offset = 0;
@@ -177,7 +177,7 @@ int FileSystem::listdir(const std::string &path, std::vector<std::string> &resul
 }
 
 int FileSystem::createfile(const std::string &path){
-  CHECK_INIT 
+  CHECK_INIT
 
   dir_entry_t new_dir_struct;
   dir_entry_t dir_cluster[32];
@@ -223,7 +223,7 @@ int FileSystem::createfile(const std::string &path){
 }
 
 int FileSystem::unlink(const std::string &path){
-  CHECK_INIT 
+  CHECK_INIT
 
   dir_entry_t dir_cluster[32];
   unsigned short cluster_offset = 0;
@@ -256,7 +256,7 @@ int FileSystem::unlink(const std::string &path){
 }
 
 int FileSystem::write(const std::string &path, const std::string &content){
-  CHECK_INIT 
+  CHECK_INIT
 
   unlink(path);
   createfile(path);
@@ -297,14 +297,14 @@ int FileSystem::write(const std::string &path, const std::string &content){
 }
 
 int FileSystem::append(const std::string &path, const std::string &content){
-  CHECK_INIT 
+  CHECK_INIT
   (void)path;
   (void)content;
   return -1;
 }
 
 int FileSystem::read(const std::string &path, std::string &content){
-  CHECK_INIT 
+  CHECK_INIT
 
   (void)path;
   (void)content;
@@ -325,7 +325,7 @@ void FileSystem::readblock(void *into, const unsigned int offset) const {
 
 void FileSystem::writeblock(const void * buf, const unsigned int offset){
 
-  // we have to read and overwrite the whole file :S 
+  // we have to read and overwrite the whole file :S
   unsigned char *wholebuffer = 0;
   long fsize = 0;
 
