@@ -281,7 +281,10 @@ int FileSystem::write(const std::string &path, const std::string &content){
   }
 
   fmt_uint_into_uchar8quad(dir_cluster[wr_i].size, new_fsize);
+  writeblock(dir_cluster, cluster_offset);
+
   // mvtodo: follow fat and lay file contents
+
   return RET_OK;
 }
 
@@ -477,5 +480,10 @@ void FileSystem::follow_fat_erase(const unsigned char *fb){
     follow_fat_erase(auxbuf);
   }
 
+}
+
+unsigned short FileSystem::lay_file_contents(const unsigned short fid_start){
+  // mvtodo
+  return -1;
 }
 
