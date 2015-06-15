@@ -38,7 +38,7 @@ class InitCommand : public Command {
       std::cout << "=> Initializing file system...";
       int result = fs.init();
       if (result != RET_OK){
-        die("Error initializing file system", result);
+        print_exception("Error initializing file system", result);
       } else {
         std::cout << " DONE!" << std::endl;
       }
@@ -53,7 +53,7 @@ class LoadCommand : public Command {
       std::cout << "=> Loading filesystem...";
       int result = fs.load();
       if (result != RET_OK){
-        die("Error loading file system", result);
+        print_exception("Error loading file system", result);
       } else {
         std::cout << " DONE!" << std::endl;
       }
@@ -82,7 +82,7 @@ class MakeDirCommand : public Command {
       } else if (result == RET_FAT_FULL) {
         std::cout << "[ERROR] FAT is full!" << std::endl;
       } else {
-        die("Error creating directory", result);
+        print_exception("Error creating directory", result);
       }
     }
 };
@@ -107,10 +107,10 @@ class CreateCommand : public Command {
         } else if (result == RET_NOT_INITIALIZED) {
           std::cout << "[ERROR] Filesystem not loaded!" << std::endl;
         } else if (result != RET_OK) {
-          die("Error creating file", result);
+          print_exception("Error creating file", result);
         }
       } catch(FSExcept &e) {
-        die("Error creating file: " + e.message, e.code);
+        print_exception("Error creating file: " + e.message, e.code);
       }
     }
 };
@@ -141,10 +141,10 @@ class ListCommand : public Command {
         } else if (result == RET_NOT_INITIALIZED) {
           std::cout << "[ERROR] Filesystem not loaded!" << std::endl;
         } else {
-          die("Error listing directory", result);
+          print_exception("Error listing directory", result);
         }
       } catch(FSExcept &e) {
-        die("Error listing directory: " + e.message, e.code);
+        print_exception("Error listing directory: " + e.message, e.code);
       }
     }
 };
@@ -165,10 +165,10 @@ class UnlinkCommand : public Command {
         if (result == RET_NOT_INITIALIZED) {
           std::cout << "[ERROR] Filesystem not loaded!" << std::endl;
         } else if (result != RET_OK) {
-          die("Error unlinking", result);
+          print_exception("Error unlinking", result);
         }
       } catch(FSExcept &e) {
-        die("Error unlinking: " + e.message, e.code);
+        print_exception("Error unlinking: " + e.message, e.code);
       }
     }
 };

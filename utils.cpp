@@ -22,10 +22,9 @@ void debug(const std::string& msg) {
 #endif
 }
 
-void die(const std::string& msg, int error_code) {
+void print_exception(const std::string& msg, int error_code) {
   std::cout << msg << std::endl;
   std::cout << "Error code: " << error_code << std::endl;
-  exit(error_code);
 }
 
 bool file_exists(const std::string& path) {
