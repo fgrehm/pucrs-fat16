@@ -257,7 +257,16 @@ T_011_basic_operations() {
 
   # write foo-1234 /home/file-a
   if ! run "load\nwrite foo-1234 /home/file-a" > /tmp/pucrs-fat16-test ; then
-    $T_fail "Was not able to unlink file \(1\)"
+    $T_fail "Was not able to write file \(1\)"
+    return 1
+  fi
+}
+
+T_012_does_not_allow_writing_on_top_of_a_dir() {
+  rm -f $PARTITION_FILE
+
+  if ! run "init\nload\nmkdir /a-dir\nwrite bla /a-dir" | grep -q " \[ERROR\] '/a-dir' is a directory!"; then
+    $T_fail "Was able to write on top of a directory"
     return 1
   fi
 }

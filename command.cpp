@@ -188,6 +188,8 @@ class WriteCommand : public Command {
         int result = fs.write(opts[1], opts[0]);
         if (result == RET_NOT_INITIALIZED) {
           std::cout << "[ERROR] Filesystem not loaded!" << std::endl;
+        } else if (result == RET_DIR_ALREADY_EXISTS) {
+          std::cout << "[ERROR] '" << opts[1] << "' is a directory!" << std::endl;
         } else if (result != RET_OK) {
           print_exception("Error writing", result);
         }
@@ -200,7 +202,7 @@ class WriteCommand : public Command {
 class AppendCommand : public Command {
   public:
     AppendCommand(const std::string &n, const std::string& o) : Command(n, o) {
-      help_text = "USAGE: `append \"contents-to\" /path/to/file`";
+      help_text = "USAGE: `append contents-to /path/to/file`";
     }
 
     bool validate() {
@@ -208,9 +210,16 @@ class AppendCommand : public Command {
     }
 
     void run(FileSystem& fs) {
-      (void)fs;
-      debug("Will append \"" + opts[0] + "\" to `" + opts[1] + "`");
-      // TODO: fs.append(opts[0], filesout);
+      try {
+        int result = fs.append(opts[1], opts[0]);
+        if (result == RET_NOT_INITIALIZED) {
+          std::cout << "[ERROR] Filesystem not loaded!" << std::endl;
+        } else if (result != RET_OK) {
+          print_exception("Error appending", result);
+        }
+      } catch(FSExcept &e) {
+        print_exception("Error appending: " + e.message, e.code);
+      }
     }
 };
 
