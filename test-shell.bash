@@ -9,26 +9,7 @@ run() {
   return $?
 }
 
-T_001_recognizes_all_valid_commands() {
-  for cmd in init load ls mkdir create unlink write append read; do
-    # Not needed once init is only handled by the shell
-    rm -f $PARTITION_FILE
-    if run "${cmd}" | grep -q ': command not found$'; then
-      $T_fail "'${cmd}' was not recognized as a valid command"
-      return 1
-    fi
-  done
-}
-
-T_002_recognizes_invalid_commands() {
-  rm -f $PARTITION_FILE
-  if ! run "WAT" | grep -q ': command not found$'; then
-    $T_fail "'WAT' was recognized as a valid command"
-    return 1
-  fi
-}
-
-T_003_init_creates_partition_file() {
+T_001_init_creates_partition_file() {
   rm -f $PARTITION_FILE
 
   if ! run "init" > /dev/null; then
@@ -37,6 +18,26 @@ T_003_init_creates_partition_file() {
   fi
 
   [[ -f $PARTITION_FILE ]] || $T_fail "Partition not created"
+}
+
+T_002_recognizes_all_valid_commands() {
+  for cmd in load ls mkdir create unlink write append read; do
+    # Not needed once init is only handled by the shell
+    rm -f $PARTITION_FILE
+    run "init" > /dev/null
+    if run "${cmd}" | grep -q ': command not found$'; then
+      $T_fail "'${cmd}' was not recognized as a valid command"
+      return 1
+    fi
+  done
+}
+
+T_003_recognizes_invalid_commands() {
+  rm -f $PARTITION_FILE
+  if ! run "WAT" | grep -q ': command not found$'; then
+    $T_fail "'WAT' was recognized as a valid command"
+    return 1
+  fi
 }
 
 T_005_init_recreates_partition_file() {

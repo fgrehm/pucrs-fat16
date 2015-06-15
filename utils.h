@@ -14,6 +14,7 @@ std::vector<std::string> split(const std::string&, char);
 std::string join(const std::vector<std::string>&, std::string);
 std::string get_env(const std::string&);
 void debug(const std::string&);
+void die(const std::string&, int);
 bool file_exists (const std::string& name);
 std::string fmt_ascii7_to_stdstr(const unsigned char *);
 void fmt_char8_into_uchar8(unsigned char*, const char *);
