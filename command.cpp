@@ -189,10 +189,10 @@ class WriteCommand : public Command {
         if (result == RET_NOT_INITIALIZED) {
           std::cout << "[ERROR] Filesystem not loaded!" << std::endl;
         } else if (result != RET_OK) {
-          print_exception("Error unlinking", result);
+          print_exception("Error writing", result);
         }
       } catch(FSExcept &e) {
-        print_exception("Error unlinking: " + e.message, e.code);
+        print_exception("Error writing: " + e.message, e.code);
       }
     }
 };
