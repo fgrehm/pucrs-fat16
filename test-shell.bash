@@ -256,8 +256,32 @@ T_011_basic_operations() {
   fi
 
   # write foo-1234 /home/file-a
-  if ! run "load\nwrite foo-1234 /home/file-a" > /tmp/pucrs-fat16-test ; then
-    $T_fail "Was not able to write file \(1\)"
+  if ! run "load\nwrite foo-1234 /home/file-a" > /dev/null ; then
+    $T_fail "Was not able to write file"
+    return 1
+  fi
+  if ! run "load\nread /home/file-a" > /tmp/pucrs-fat16-test ; then
+    $T_fail "Was not able to read file \(1\)"
+    return 1
+  fi
+  if ! grep -q 'foo-1234' /tmp/pucrs-fat16-test; then
+    $T_fail "Write did not work"
+    return 1
+  fi
+
+  # append -hello /home/file-a
+  if ! run "load\nappend -hello /home/file-a" > /dev/null ; then
+    $T_fail "Was not able to append to file"
+    return 1
+  fi
+
+  # read /home/file-a
+  if ! run "load\nread /home/file-a" > /tmp/pucrs-fat16-test ; then
+    $T_fail "Was not able to read file \(2\)"
+    return 1
+  fi
+  if ! grep -q 'foo-1234-hello' /tmp/pucrs-fat16-test; then
+    $T_fail "Append did not work"
     return 1
   fi
 }
