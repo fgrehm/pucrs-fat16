@@ -33,6 +33,11 @@ void FileSystem::debug(){
   this->makedir("/home/box");
   this->makedir("/home/box/bolo");
   this->createfile("/home/box/cusco.txt");
+  std::vector<std::string> resp;
+  this->listdir("/home/box", resp);
+  for (unsigned int i=0; i<resp.size(); i++){
+    std::cout << "ls: " << resp[i] << std::endl;
+  }
   int stop=1; // mvdebug
 
 }
@@ -130,9 +135,32 @@ int FileSystem::makedir(const std::string &path){
 int FileSystem::listdir(const std::string &path, std::vector<std::string> &result){
   CHECK_INIT 
 
-  (void)path;
-  (void)result;
-  return -1;
+  dir_entry_t new_dir_struct;
+  dir_entry_t dir_cluster[32];
+  unsigned short cluster_offset = 0;
+
+  std::string banzai = path;
+  banzai += "/xoxoxo";
+  int cof_i = traverse_path(banzai, ROOTDIR_OFFSET); // BANZAI!!!!!!
+  if (cof_i == -1){
+      std::string aux = "Could not follow path: ";
+      aux += path;
+      throw FSExcept(aux, RET_INTERNAL_ERROR);
+  } else{
+    cluster_offset = cof_i;
+  }
+  readblock(dir_cluster, cluster_offset);
+
+  std::vector<std::string> ret;
+  for (unsigned int i=0; i<32; i++){
+    if (dir_cluster[i].filename[0] != 0x00){
+      std::string aux = fmt_ascii7_to_stdstr(dir_cluster[i].filename);
+      ret.push_back(aux);
+    }
+  }
+  result = ret;
+
+  return RET_OK;
 }
 
 int FileSystem::createfile(const std::string &path){
@@ -184,6 +212,7 @@ int FileSystem::createfile(const std::string &path){
 int FileSystem::unlink(const std::string &path){
   CHECK_INIT 
   (void)path;
+  // mvtodo: pra unlinkar tem que apagar na fat E dar baixa no filename tambem! (zerar o primeiro byte do filename)
   return -1;
 }
 
