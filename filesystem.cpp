@@ -29,11 +29,20 @@ void FileSystem::debug(){
   if (this->load() != RET_OK){
     ::debug("Load failed.");
   }
+
+  std::string str1k;
+  std::string str2k;
+  for (unsigned int i=0; i<1024; i++){
+    str1k += "a";
+    str2k += "bb";
+  }
+
   this->makedir("/home");
   this->makedir("/home/box");
   this->makedir("/home/box/bolo");
   this->createfile("/home/box/torto.txt");
   this->createfile("/home/box/cusco.txt");
+  this->write("/home/box/cusco.txt", str2k);
   this->unlink("/home/box/torto.txt");
   std::vector<std::string> resp;
   this->listdir("/home/box", resp);
@@ -218,9 +227,9 @@ int FileSystem::unlink(const std::string &path){
 
   int cof_i = traverse_path(path, ROOTDIR_OFFSET);
   if (cof_i == -1){
-      std::string aux = "Could not follow path: ";
-      aux += path;
-      throw FSExcept(aux, RET_INTERNAL_ERROR);
+    std::string aux = "Could not follow path: ";
+    aux += path;
+    throw FSExcept(aux, RET_INTERNAL_ERROR);
   } else{
     cluster_offset = cof_i;
   }
@@ -245,9 +254,33 @@ int FileSystem::unlink(const std::string &path){
 
 int FileSystem::write(const std::string &path, const std::string &content){
   CHECK_INIT 
-  (void)path;
-  (void)content;
-  return -1;
+
+  dir_entry_t dir_cluster[32];
+  unsigned short cluster_offset = 0;
+  const unsigned short new_fsize = content.size();
+  if (new_fsize == 0){
+    return RET_OK; // we dont care
+  }
+
+  int cof_i = traverse_path(path, ROOTDIR_OFFSET);
+  if (cof_i == -1){
+    std::string aux = "Could not follow path: ";
+    aux += path;
+    throw FSExcept(aux, RET_INTERNAL_ERROR);
+  } else{
+    cluster_offset = cof_i;
+  }
+  readblock(dir_cluster, cluster_offset);
+
+  std::string target = utils_basename(path);
+  int rm_i = find_match_in_dir(target, dir_cluster);
+  if (rm_i == -1){
+    std::string aux = "Could not follow path: ";
+    aux += path;
+    throw FSExcept(aux, RET_INTERNAL_ERROR);
+  }
+
+  return RET_OK;
 }
 
 int FileSystem::append(const std::string &path, const std::string &content){
