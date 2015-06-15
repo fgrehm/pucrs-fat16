@@ -234,9 +234,12 @@ int FileSystem::unlink(const std::string &path){
     throw FSExcept(aux, RET_INTERNAL_ERROR);
   }
 
-  // follow fat entry and go dando baixa
+  // da baixa no arquivo
+  dir_cluster[rm_i].filename[0] = 0x00;
+  follow_fat_erase(dir_cluster[rm_i].first_block);
 
-  // mvtodo: pra unlinkar tem que apagar na fat E dar baixa no filename tambem! (zerar o primeiro byte do filename)
+  writeblock(dir_cluster, cluster_offset);
+  dumpfat();
   return RET_OK;
 }
 
@@ -414,18 +417,14 @@ int FileSystem::traverse_path(const std::string &path, const unsigned short offs
 
   }
 
-  /*for (unsigned int i=0; i<path_sep.size(); i++){
+}
 
-    std::string thisentry = path_sep[0];
-    int idx = find_match_in_dir(thisentry, current_cluster);
+void FileSystem::follow_fat_erase(const unsigned char *fb){
 
-    if (idx == -1){
-      std::string aux = "Could not follow path: ";
-      aux += path;
-      throw FSExcept(aux, RET_INTERNAL_ERROR);
-    }
+  // persegue um first block (fb) na fat e vai liberando na fat.
+  // esta funcao nao dumpeia a fat pro disco. chamar manualmente depois!
 
-  }*/
+  // mvtodo: ...
 
 }
 

@@ -98,6 +98,7 @@ class FileSystem {
     bool has_in_dir(const std::string &name, const dir_entry_t *dir) const;
 
     int traverse_path(const std::string&, const unsigned short);
+    void follow_fat_erase(const unsigned char *);
 
     void dumpfat();
     void dumprootdir();
