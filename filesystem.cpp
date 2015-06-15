@@ -319,7 +319,9 @@ void FileSystem::writeblock(const void * buf, const unsigned int offset){
 void FileSystem::createdummy() const {
 
   FILE* fd_write = fopen(part_filename.c_str(), "wb+");
-  // mvtodo: fopen error treating
+  if (fd_write == NULL){
+    throw FSExcept("Cannot create dummy file.part", RET_INTERNAL_ERROR);
+  }
 
   // MV: for some reason, using more than a handful of K's on the stack was causing a segfault.
   // took hours to figure it out, but theres a really DUMB solution down below
