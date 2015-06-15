@@ -225,9 +225,20 @@ class ReadCommand : public Command {
     }
 
     void run(FileSystem& fs) {
-      (void)fs;
-      debug("Will read `" + opts[0] + "`");
-      // TODO: fs.read(opts[0], fileout);
+      try {
+        std::string contents;
+        int result = fs.read(opts[0], contents);
+        if (result == RET_OK) {
+          std::cout << "File contents:" << std::endl;
+          std::cout << contents << std::endl;
+        } else if (result == RET_NOT_INITIALIZED) {
+          std::cout << "[ERROR] Filesystem not loaded!" << std::endl;
+        } else {
+          print_exception("Error reading", result);
+        }
+      } catch(FSExcept &e) {
+        print_exception("Error reading: " + e.message, e.code);
+      }
     }
 };
 
