@@ -5,7 +5,7 @@
 export PARTITION_FILE="fat.test.part"
 
 run() {
-  echo $1 | ./pucrs-fat16 2>&1
+  echo -e $1 | ./pucrs-fat16 2>&1
   return $?
 }
 
@@ -203,6 +203,56 @@ T_010_read_validates_its_arguments() {
 
   if run "read /foo/bar" | grep -q '^$ USAGE: `read '; then
     $T_fail "Did not recognize the parameters provided"
+    return 1
+  fi
+}
+
+T_011_basic_operations() {
+  rm -f $PARTITION_FILE
+
+  if ! run "init" > /dev/null; then
+    $T_fail "Initialization failed"
+    return 1
+  fi
+
+  if ! run "load" > /dev/null; then
+    $T_fail "Load failed"
+    return 1
+  fi
+
+  # ls /
+  if ! run "load\nls /" | grep -q '^$ => Directory is empty'; then
+    $T_fail "Was not able to list empty root dir"
+    return 1
+  fi
+
+  # mkdir /home && ls /
+  if ! run "load\nmkdir /home\nls /" | grep -q '^ home'; then
+    $T_fail "Was not able to create dir on root"
+    return 1
+  fi
+
+  # create /home/file-a && create /home/file-b && ls /home
+  if ! run "load\ncreate /home/file-a\ncreate /home/file-b\nls /home" > /tmp/pucrs-fat16-test ; then
+    $T_fail "Was not able to create files \(1\)"
+    return 1
+  fi
+  if ! (grep -q '^ file-a' /tmp/pucrs-fat16-test && grep -q '^ file-b' /tmp/pucrs-fat16-test); then
+    $T_fail "Was not able to create files \(2\)"
+    return 1
+  fi
+
+  # create /home/remove-file && unlink /home/remove-file && ls /home
+  if ! run "load\ncreate /home/remove-file\nunlink /home/remove-file\nls /home" > /tmp/pucrs-fat16-test ; then
+    $T_fail "Was not able to unlink file \(1\)"
+    return 1
+  fi
+  if grep -q '^ remove-file' /tmp/pucrs-fat16-test; then
+    $T_fail "Was not able to unlink file \(2\)"
+    return 1
+  fi
+  if ! (grep -q '^ file-a' /tmp/pucrs-fat16-test && grep -q '^ file-b' /tmp/pucrs-fat16-test); then
+    $T_fail "Unlink removed the wrong files"
     return 1
   fi
 }
