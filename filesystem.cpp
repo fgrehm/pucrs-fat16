@@ -12,6 +12,12 @@
 #define ROOTDIR_OFFSET    9*1024
 #define DATA_OFFSET       10*1024
 
+// mvtodo: nao esquecer de removero _DEBUG_ antes de entregar
+// mvtodo: write pra arq no root funfa?
+// mvtodo: read pra arq no root funfa?
+// mvtodo: unlink funfa no root?
+// mvtodo: create funfa root?
+
 FileSystem::FileSystem(const std::string &partfname):part_filename(partfname), initialized(false){
   memset(fat, 0x00, sizeof(fat));
 }
@@ -30,6 +36,7 @@ void FileSystem::debug(){
     ::debug("Load failed.");
   }
 
+  std::string str_ret;
   std::string str1k;
   std::string str2k;
   for (unsigned int i=0; i<1024; i++){
@@ -45,6 +52,8 @@ void FileSystem::debug(){
   this->makedir("/home");
   this->createfile("/home/bug.txt");
   this->write("/home/bug.txt", str2k);
+  this->read("/home/bug.txt", str_ret);
+  std::cout << "read [" << str_ret << "]" << std::endl;
   int stop=1; // mvdebug
 
 }
@@ -306,9 +315,32 @@ int FileSystem::append(const std::string &path, const std::string &content){
 int FileSystem::read(const std::string &path, std::string &content){
   CHECK_INIT 
 
-  (void)path;
-  (void)content;
-  return -1;
+  dir_entry_t dir_cluster[32];
+  unsigned short cluster_offset = 0;
+
+  int cof_i = traverse_path(path, ROOTDIR_OFFSET);
+  if (cof_i == -1){
+    std::string aux = "Could not follow path: ";
+    aux += path;
+    throw FSExcept(aux, RET_INTERNAL_ERROR);
+  } else{
+    cluster_offset = cof_i;
+  }
+  readblock(dir_cluster, cluster_offset);
+
+  std::string target = utils_basename(path);
+  int rd_i = find_match_in_dir(target, dir_cluster);
+  if (rd_i == -1){
+    std::string aux = "Could not follow path: ";
+    aux += path;
+    throw FSExcept(aux, RET_INTERNAL_ERROR);
+  }
+
+  const unsigned short fid = fmt_uchar8pair_to_ushort(dir_cluster[rd_i].first_block);
+  std::string ret = get_file_contents(fid);
+  content = ret;
+
+  return RET_OK;
 }
 
 void FileSystem::readblock(void *into, const unsigned int offset) const {
@@ -523,6 +555,13 @@ void FileSystem::lay_file_contents(const unsigned short fid_start, const std::st
   }
 
   writeblock(buf, fid_start*1024);
+
+}
+
+std::string FileSystem::get_file_contents(const unsigned short fid_start){
+
+  std::string ret;
+  return ret;
 
 }
 
