@@ -100,14 +100,13 @@ class CreateCommand : public Command {
     void run(FileSystem& fs) {
       try {
         int result = fs.createfile(opts[0]);
-        if (result == RET_OK) {
-        } else if (result == RET_FAT_FULL) {
+        if (result == RET_FAT_FULL) {
           std::cout << "[ERROR] FAT is full!" << std::endl;
         } else if (result == RET_DIR_ALREADY_EXISTS) {
           std::cout << "[ERROR] Directory already exists!" << std::endl;
         } else if (result == RET_NOT_INITIALIZED) {
           std::cout << "[ERROR] Filesystem not loaded!" << std::endl;
-        } else {
+        } else if (result != RET_OK) {
           die("Error creating file", result);
         }
       } catch(FSExcept &e) {
@@ -134,8 +133,9 @@ class ListCommand : public Command {
           if (resp.size() == 0) {
             std::cout << "=> Directory is empty" << std::endl;
           } else {
+            std::cout << opts[0] << std::endl;
             for (unsigned int i=0; i<resp.size(); i++){
-              std::cout << "- " << resp[i] << std::endl;
+              std::cout << " " << resp[i] << std::endl;
             }
           }
         } else if (result == RET_NOT_INITIALIZED) {
@@ -160,9 +160,16 @@ class UnlinkCommand : public Command {
     }
 
     void run(FileSystem& fs) {
-      (void)fs;
-      debug("Will unlink `" + opts[0] + "`");
-      // TODO: fs.listdir(opts[0], filesout);
+      try {
+        int result = fs.unlink(opts[0]);
+        if (result == RET_NOT_INITIALIZED) {
+          std::cout << "[ERROR] Filesystem not loaded!" << std::endl;
+        } else if (result != RET_OK) {
+          die("Error unlinking", result);
+        }
+      } catch(FSExcept &e) {
+        die("Error unlinking: " + e.message, e.code);
+      }
     }
 };
 
