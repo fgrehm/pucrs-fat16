@@ -32,6 +32,7 @@ void FileSystem::debug(){
   this->makedir("/home");
   this->makedir("/home/box");
   this->makedir("/home/box/bolo");
+  this->createfile("/home/box/cusco.txt");
   int stop=1; // mvdebug
 
 }
@@ -136,8 +137,48 @@ int FileSystem::listdir(const std::string &path, std::vector<std::string> &resul
 
 int FileSystem::createfile(const std::string &path){
   CHECK_INIT 
-  (void)path;
-  return -1;
+
+  dir_entry_t new_dir_struct;
+  dir_entry_t dir_cluster[32];
+  unsigned short cluster_offset = 0;
+  const std::string new_dir_name = utils_basename(path);
+
+  int cof_i = traverse_path(path, ROOTDIR_OFFSET);
+  if (cof_i == -1){
+      std::string aux = "Could not follow path: ";
+      aux += path;
+      throw FSExcept(aux, RET_INTERNAL_ERROR);
+  } else{
+    cluster_offset = cof_i;
+  }
+
+  readblock(dir_cluster, cluster_offset);
+
+  if (has_in_dir(new_dir_name, dir_cluster)){
+    return RET_DIR_ALREADY_EXISTS;
+  }
+
+  const unsigned short d_idx = find_free_in_dir(dir_cluster);
+  unsigned short f_idx = 0;
+
+  int test_aux = find_free_fat();
+  if (test_aux == -1){
+    return RET_FAT_FULL;
+  } else {
+    f_idx = test_aux;
+  }
+
+  fmt_ushort_into_uchar8pair(&(fat[f_idx*2]), 0xffff);
+  fmt_char8_into_uchar8(new_dir_struct.filename, new_dir_name.c_str());
+  new_dir_struct.attributes = 0;
+  fmt_ushort_into_uchar8pair(new_dir_struct.first_block, f_idx);
+  fmt_uint_into_uchar8quad(new_dir_struct.size, 0);
+
+  memcpy(&dir_cluster[d_idx], &new_dir_struct, sizeof(dir_entry_t));
+  dumpfat();
+  writeblock(dir_cluster, cluster_offset);
+
+  return RET_OK;
 }
 
 int FileSystem::unlink(const std::string &path){
