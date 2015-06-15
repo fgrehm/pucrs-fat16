@@ -13,10 +13,6 @@
 #define DATA_OFFSET       10*1024
 
 // mvtodo: nao esquecer de removero _DEBUG_ antes de entregar
-// mvtodo: write pra arq no root funfa?
-// mvtodo: read pra arq no root funfa?
-// mvtodo: unlink funfa no root?
-// mvtodo: create funfa root?
 
 FileSystem::FileSystem(const std::string &partfname):part_filename(partfname), initialized(false){
   memset(fat, 0x00, sizeof(fat));
@@ -51,7 +47,8 @@ void FileSystem::debug(){
   this->load();
   this->makedir("/home");
   this->createfile("/home/bug.txt");
-  this->write("/home/bug.txt", str2k);
+  //this->write("/home/bug.txt", str2k);
+  this->write("/home/bug.txt", str1k);
   this->read("/home/bug.txt", str_ret);
   std::cout << "read [" << str_ret << "]" << std::endl;
   int stop=1; // mvdebug
@@ -343,7 +340,8 @@ int FileSystem::read(const std::string &path, std::string &content){
   }
 
   const unsigned short fid = fmt_uchar8pair_to_ushort(dir_cluster[rd_i].first_block);
-  std::string ret = get_file_contents(fid);
+  const unsigned int fsz = fmt_uchar8quad_to_uint(dir_cluster[rd_i].size);
+  std::string ret = get_file_contents(fid, fsz);
   content = ret;
 
   return RET_OK;
@@ -564,9 +562,25 @@ void FileSystem::lay_file_contents(const unsigned short fid_start, const std::st
 
 }
 
-std::string FileSystem::get_file_contents(const unsigned short fid_start){
+std::string FileSystem::get_file_contents(const unsigned short fid_start, const unsigned int size_to_go){
 
   std::string ret;
+  unsigned char buf[1024];
+  memset(buf, 0x00, sizeof(buf));
+
+  const unsigned short fid_content = fmt_uchar8pair_to_ushort(&(fat[fid_start*2]));
+  if (size_to_go <= 1024){
+    // this is the end.
+
+    // mvtodo: check if fid_content is ffff (should be)
+    readblock(buf, fid_start*1024);
+    // mvtodo: set ret
+
+  } else {
+    // theres more. lets recurse.
+    ret += get_file_contents(fid_content, size_to_go-1024);
+  }
+
   return ret;
 
 }
