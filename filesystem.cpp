@@ -270,9 +270,7 @@ int FileSystem::unlink(const std::string &path){
 int FileSystem::write(const std::string &path, const std::string &content){
   CHECK_INIT
 
-  unlink(path);
-  createfile(path);
-
+  // Do not care if an empty string was provided
   dir_entry_t dir_cluster[32];
   unsigned short cluster_offset = 0;
   const unsigned int new_fsize = content.size();
@@ -280,6 +278,7 @@ int FileSystem::write(const std::string &path, const std::string &content){
     return RET_OK; // we dont care
   }
 
+  // Make sure the file exists before write operation
   int cof_i = traverse_path(path, ROOTDIR_OFFSET);
   if (cof_i == -1){
     std::string aux = "Could not follow path: ";
@@ -289,7 +288,6 @@ int FileSystem::write(const std::string &path, const std::string &content){
     cluster_offset = cof_i;
   }
   readblock(dir_cluster, cluster_offset);
-
   std::string target = utils_basename(path);
   int wr_i = find_match_in_dir(target, dir_cluster);
   if (wr_i == -1){
@@ -297,6 +295,13 @@ int FileSystem::write(const std::string &path, const std::string &content){
     aux += path;
     throw FSExcept(aux, RET_INTERNAL_ERROR);
   }
+
+  if (dir_cluster[wr_i].attributes == 1) {
+    return RET_DIR_ALREADY_EXISTS;
+  }
+
+  unlink(path);
+  createfile(path);
 
   fmt_uint_into_uchar8quad(dir_cluster[wr_i].size, new_fsize);
   writeblock(dir_cluster, cluster_offset);

@@ -188,6 +188,8 @@ class WriteCommand : public Command {
         int result = fs.write(opts[1], opts[0]);
         if (result == RET_NOT_INITIALIZED) {
           std::cout << "[ERROR] Filesystem not loaded!" << std::endl;
+        } else if (result == RET_DIR_ALREADY_EXISTS) {
+          std::cout << "[ERROR] '" << opts[1] << "' is a directory!" << std::endl;
         } else if (result != RET_OK) {
           print_exception("Error writing", result);
         }
