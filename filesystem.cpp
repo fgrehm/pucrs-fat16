@@ -31,7 +31,7 @@ void FileSystem::debug(){
   }
   this->makedir("/home");
   this->makedir("/home/box");
-  this->makedir("/home/box/bolo");
+  //this->makedir("/home/box/bolo");
 
 }
 
@@ -81,70 +81,45 @@ int FileSystem::load(){
 int FileSystem::makedir(const std::string &path){
   CHECK_INIT 
 
-  const std::string new_dir_name = utils_basename(path);
   dir_entry_t new_dir_struct;
+  dir_entry_t dir_cluster[32];
+  unsigned short cluster_offset = 0;
+  const std::string new_dir_name = utils_basename(path);
 
-  std::vector<std::string> sep = tokenize_path(path);
-  if (sep.size() == 1){
-    // special case: into root dir directly
-
-    // we start at the root dir
-    dir_entry_t dir_cluster[32];
-    unsigned short cluster_offset = ROOTDIR_OFFSET;
-    readblock(dir_cluster, cluster_offset);
-
-    if (has_in_dir(new_dir_name, dir_cluster)){
-      return RET_DIR_ALREADY_EXISTS;
-    }
-
-    const unsigned short d_idx = find_free_in_dir(dir_cluster);
-    unsigned short f_idx = 0;
-
-    int test_aux = find_free_fat();
-    if (test_aux == -1){
-      return RET_FAT_FULL;
-    } else {
-      f_idx = test_aux;
-    }
-
-    fmt_ushort_into_uchar8pair(&(fat[f_idx]), 0xffff);
-    fmt_char8_into_uchar8(new_dir_struct.filename, new_dir_name.c_str());
-    new_dir_struct.attributes = 1;
-    fmt_ushort_into_uchar8pair(new_dir_struct.first_block, f_idx);
-    fmt_uint_into_uchar8quad(new_dir_struct.size, 1024);
-
-    memcpy(&dir_cluster[d_idx], &new_dir_struct, sizeof(dir_entry_t));
-    dumpfat();
-    writeblock(dir_cluster, cluster_offset);
-   
-  } else {
-
-    // we start at the root dir
-    dir_entry_t dir_cluster[32];
-    unsigned short cluster_offset = ROOTDIR_OFFSET;
-    readblock(dir_cluster, cluster_offset);
-
-    for (unsigned int i=0; i<sep.size(); i++){
-      // we must now find sep[i] inside dir_cluster
-      int ret = find_match_in_dir(sep[i], dir_cluster);
-
-      if (ret == -1){
-        std::string aux = "Could not follow path: ";
-        aux += path;
-        throw FSExcept(aux, RET_INTERNAL_ERROR);
-      }
-
-      std::string newpath = popleft_path(path);
-      const unsigned int init_offset = fmt_uchar8pair_to_ushort(dir_cluster[ret].first_block);
-      const unsigned int parent_offset = traverse_path(newpath, init_offset);
-
-      // read the parent
-      unsigned short cluster_offset = parent_offset;
-      readblock(dir_cluster, parent_offset);
-
-    }
-
+  int cof_i = traverse_path(path, ROOTDIR_OFFSET);
+  if (cof_i == -1){
+      std::string aux = "Could not follow path: ";
+      aux += path;
+      throw FSExcept(aux, RET_INTERNAL_ERROR);
+  } else{
+    cluster_offset = cof_i;
   }
+
+  readblock(dir_cluster, cluster_offset);
+
+  if (has_in_dir(new_dir_name, dir_cluster)){
+    return RET_DIR_ALREADY_EXISTS;
+  }
+
+  const unsigned short d_idx = find_free_in_dir(dir_cluster);
+  unsigned short f_idx = 0;
+
+  int test_aux = find_free_fat();
+  if (test_aux == -1){
+    return RET_FAT_FULL;
+  } else {
+    f_idx = test_aux;
+  }
+
+  fmt_ushort_into_uchar8pair(&(fat[f_idx]), 0xffff);
+  fmt_char8_into_uchar8(new_dir_struct.filename, new_dir_name.c_str());
+  new_dir_struct.attributes = 1;
+  fmt_ushort_into_uchar8pair(new_dir_struct.first_block, f_idx);
+  fmt_uint_into_uchar8quad(new_dir_struct.size, 1024);
+
+  memcpy(&dir_cluster[d_idx], &new_dir_struct, sizeof(dir_entry_t));
+  dumpfat();
+  writeblock(dir_cluster, cluster_offset);
 
  return RET_OK;
 
@@ -319,15 +294,32 @@ int FileSystem::traverse_path(const std::string &path, const unsigned short offs
 
   if (sep.size() == 1){
     // we are at the parent. return offset here
-    return ret*1024;
+    return ret;
   } else {
     // we need to go deeper...
+
+    dir_entry_t current_cluster[32];
+    readblock(current_cluster, offsetstart);
+    int md_i = find_match_in_dir(sep[0], current_cluster);
+    if (md_i == -1){
+      std::string aux = "Could not follow path: ";
+      aux += path;
+      throw FSExcept(aux, RET_INTERNAL_ERROR);
+    }
+
+    if (current_cluster[md_i].attributes != 1){
+      std::string aux = "Could not follow path (non-dir in the middle!): ";
+      aux += path;
+      throw FSExcept(aux, RET_INTERNAL_ERROR);
+    }
+
+    unsigned short fid = fmt_uchar8pair_to_ushort(current_cluster[md_i].first_block);
+    ret = traverse_path(nextpath, fid*1024);
+    return ret;
+
   }
 
-  /*dir_entry_t current_cluster[32];
-  readblock(current_cluster, offset);
-
-  for (unsigned int i=0; i<path_sep.size(); i++){
+  /*for (unsigned int i=0; i<path_sep.size(); i++){
 
     std::string thisentry = path_sep[0];
     int idx = find_match_in_dir(thisentry, current_cluster);
@@ -340,6 +332,5 @@ int FileSystem::traverse_path(const std::string &path, const unsigned short offs
 
   }*/
 
-  return ret;
 }
 
