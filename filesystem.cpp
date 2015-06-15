@@ -34,9 +34,14 @@ void FileSystem::debug(){
   std::string str2k;
   for (unsigned int i=0; i<1024; i++){
     str1k += "a";
-    str2k += "bb";
+    str2k += "a";
+  }
+  for (unsigned int i=0; i<1024; i++){
+    str2k += "b";
   }
 
+  this->init();
+  this->load();
   this->makedir("/home");
   this->createfile("/home/bug.txt");
   this->write("/home/bug.txt", str2k);
@@ -499,11 +504,22 @@ void FileSystem::lay_file_contents(const unsigned short fid_start, const std::st
 
   if (content.size() > 1024){
     memcpy(buf, content.c_str(), sizeof(buf));
-    // mvtodo: update fat
-    // mvtodo: find free fat
-    //lay_file_contents(mvtodo, content.substr(1024, std::string::npos);
+
+    unsigned short next_free_fid = 0;
+    int test_aux = find_free_fat();
+    if (test_aux == -1){
+      throw FSExcept("Cannot find free fat entry", RET_FAT_FULL);
+    } else {
+      next_free_fid = test_aux;
+    }
+
+    fmt_ushort_into_uchar8pair(&(fat[fid_start*2]), next_free_fid);
+    lay_file_contents(next_free_fid, content.substr(1024, std::string::npos));
+
   } else {
     memcpy(buf, content.c_str(), content.size());
+    fat[fid_start*2] = 0xff;
+    fat[(fid_start*2)+1] = 0xff;
   }
 
   writeblock(buf, fid_start*1024);
