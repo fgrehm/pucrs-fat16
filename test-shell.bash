@@ -226,8 +226,7 @@ T_011_basic_operations() {
     return 1
   fi
 
-  # mkdir /home && ls /
-  if ! run "load\nmkdir /home\nls /" | grep -q '^ home'; then
+  if ! run "load\nmkdir /home\nls /" | grep -q '^\[D\] home'; then
     $T_fail "Was not able to create dir on root"
     return 1
   fi
@@ -237,7 +236,7 @@ T_011_basic_operations() {
     $T_fail "Was not able to create files \(1\)"
     return 1
   fi
-  if ! (grep -q '^ file-a' /tmp/pucrs-fat16-test && grep -q '^ file-b' /tmp/pucrs-fat16-test); then
+  if ! (grep -q '^\[F\] file-a' /tmp/pucrs-fat16-test && grep -q '^\[F\] file-b' /tmp/pucrs-fat16-test); then
     $T_fail "Was not able to create files \(2\)"
     return 1
   fi
@@ -247,11 +246,11 @@ T_011_basic_operations() {
     $T_fail "Was not able to unlink file \(1\)"
     return 1
   fi
-  if grep -q '^ remove-file' /tmp/pucrs-fat16-test; then
+  if grep -q '^\[F\] remove-file' /tmp/pucrs-fat16-test; then
     $T_fail "Was not able to unlink file \(2\)"
     return 1
   fi
-  if ! (grep -q '^ file-a' /tmp/pucrs-fat16-test && grep -q '^ file-b' /tmp/pucrs-fat16-test); then
+  if ! (grep -q '^\[F\] file-a' /tmp/pucrs-fat16-test && grep -q '^\[F\] file-b' /tmp/pucrs-fat16-test); then
     $T_fail "Unlink removed the wrong files"
     return 1
   fi

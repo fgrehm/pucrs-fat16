@@ -177,6 +177,12 @@ int FileSystem::listdir(const std::string &path, std::vector<std::string> &resul
   for (unsigned int i=0; i<32; i++){
     if (dir_cluster[i].filename[0] != 0x00){
       std::string aux = fmt_ascii7_to_stdstr(dir_cluster[i].filename);
+      // TODO: zero should be a constant
+      if (dir_cluster[i].attributes == 0) {
+        aux = "[F] " + aux;
+      } else {
+        aux = "[D] " + aux;
+      }
       ret.push_back(aux);
     }
   }

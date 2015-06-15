@@ -135,7 +135,7 @@ class ListCommand : public Command {
           } else {
             std::cout << opts[0] << std::endl;
             for (unsigned int i=0; i<resp.size(); i++){
-              std::cout << " " << resp[i] << std::endl;
+              std::cout << resp[i] << std::endl;
             }
           }
         } else if (result == RET_NOT_INITIALIZED) {
