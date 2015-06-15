@@ -315,9 +315,15 @@ int FileSystem::write(const std::string &path, const std::string &content){
 
 int FileSystem::append(const std::string &path, const std::string &content){
   CHECK_INIT
-  (void)path;
-  (void)content;
-  return -1;
+
+  std::string new_content;
+  int result = read(path, new_content);
+  if (result != RET_OK) {
+    return result;
+  }
+
+  new_content += content;
+  return write(path, new_content);
 }
 
 int FileSystem::read(const std::string &path, std::string &content){
