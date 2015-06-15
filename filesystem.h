@@ -99,7 +99,7 @@ class FileSystem {
 
     int traverse_path(const std::string&, const unsigned short);
     void follow_fat_erase(const unsigned char *);
-    unsigned short lay_file_contents(const unsigned short);
+    void lay_file_contents(const unsigned short, const std::string &);
 
     void dumpfat();
     void dumprootdir();

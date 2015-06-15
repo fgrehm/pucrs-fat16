@@ -283,7 +283,9 @@ int FileSystem::write(const std::string &path, const std::string &content){
   fmt_uint_into_uchar8quad(dir_cluster[wr_i].size, new_fsize);
   writeblock(dir_cluster, cluster_offset);
 
-  // mvtodo: follow fat and lay file contents
+  const unsigned short fid = fmt_uchar8pair_to_ushort(dir_cluster[wr_i].first_block);
+  lay_file_contents(fid, content);
+  dumpfat();
 
   return RET_OK;
 }
@@ -485,8 +487,7 @@ void FileSystem::follow_fat_erase(const unsigned char *fb){
 
 }
 
-unsigned short FileSystem::lay_file_contents(const unsigned short fid_start){
-  // mvtodo
-  return -1;
+void FileSystem::lay_file_contents(const unsigned short fid_start, const std::string &content){
+  // mvtodo: keep laying content into datablocks and update fat accordingly, recursively
 }
 
