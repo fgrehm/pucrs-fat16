@@ -42,13 +42,14 @@ void FileSystem::debug(){
   for (unsigned int i=0; i<1024; i++){
     str2k += "b";
   }
+  str2k += "llllllllllllaaaaaaaaaaaaa";
+
 
   this->init();
   this->load();
   this->makedir("/home");
   this->createfile("/home/bug.txt");
-  //this->write("/home/bug.txt", str2k);
-  this->write("/home/bug.txt", str1k);
+  this->write("/home/bug.txt", str2k);
   this->read("/home/bug.txt", str_ret);
   std::cout << "read [" << str_ret << "]" << std::endl;
   int stop=1; // mvdebug
@@ -572,12 +573,25 @@ std::string FileSystem::get_file_contents(const unsigned short fid_start, const 
   if (size_to_go <= 1024){
     // this is the end.
 
-    // mvtodo: check if fid_content is ffff (should be)
-    readblock(buf, fid_start*1024);
-    // mvtodo: set ret
+    if (fid_content != 0xffff){
+      throw FSExcept("Your FAT went bonkers.", RET_INTERNAL_ERROR);
+    }
 
+    readblock(buf, fid_start*1024);
+    char aux[1025];
+    memset(aux, 0x00, sizeof(aux));
+    memcpy(aux, buf, size_to_go);
+    std::string straux = aux;
+    ret += aux;
+    // mvtodo: check if fid_content is ffff (should be)
   } else {
     // theres more. lets recurse.
+    readblock(buf, fid_start*1024);
+    char aux[1025];
+    memset(aux, 0x00, sizeof(aux));
+    memcpy(aux, buf, 1024);
+    std::string straux = aux;
+    ret += aux;
     ret += get_file_contents(fid_content, size_to_go-1024);
   }
 
