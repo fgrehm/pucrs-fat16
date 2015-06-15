@@ -246,6 +246,9 @@ int FileSystem::unlink(const std::string &path){
 int FileSystem::write(const std::string &path, const std::string &content){
   CHECK_INIT 
 
+  unlink(path);
+  createfile(path);
+
   dir_entry_t dir_cluster[32];
   unsigned short cluster_offset = 0;
   const unsigned int new_fsize = content.size();
