@@ -255,4 +255,10 @@ T_011_basic_operations() {
     $T_fail "Unlink removed the wrong files"
     return 1
   fi
+
+  # write foo-1234 /home/file-a
+  if ! run "load\nwrite foo-1234 /home/file-a" > /tmp/pucrs-fat16-test ; then
+    $T_fail "Was not able to unlink file \(1\)"
+    return 1
+  fi
 }
