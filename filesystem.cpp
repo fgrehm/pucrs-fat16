@@ -424,7 +424,21 @@ void FileSystem::follow_fat_erase(const unsigned char *fb){
   // persegue um first block (fb) na fat e vai liberando na fat.
   // esta funcao nao dumpeia a fat pro disco. chamar manualmente depois!
 
-  // mvtodo: ...
+  unsigned short fid = fmt_uchar8pair_to_ushort(fb);
+  if (fat[fid*2] == 0xff && fat[(fid*2)+1] == 0xff){ // EOF
+    // limpa e sai...
+    fat[fid*2] = 0x00;
+    fat[(fid*2)+1] = 0x00;
+    return;
+  } else {
+    // limpa e persegue
+    unsigned char auxbuf[2];
+    auxbuf[0] = fat[fid*2];
+    auxbuf[1] = fat[(fid*2)+1];
+    fat[fid*2] = 0x00;
+    fat[(fid*2)+1] = 0x00;
+    follow_fat_erase(auxbuf);
+  }
 
 }
 
