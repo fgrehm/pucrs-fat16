@@ -4,6 +4,7 @@
 
 #include "utils.h"
 #include "command.h"
+#include "fsexcept.h"
 
 /***************************************************
  * Custom commands logic
@@ -74,10 +75,14 @@ class MakeDirCommand : public Command {
       int result = fs.makedir(opts[0]);
       if (result == RET_OK) {
         std::cout << "=> Directory created." << std::endl;
+      } else if (result == RET_NOT_INITIALIZED) {
+        std::cout << "[ERROR] Filesystem not loaded!" << std::endl;
       } else if (result == RET_DIR_ALREADY_EXISTS) {
         std::cout << "[ERROR] Directory already exists!" << std::endl;
       } else if (result == RET_FAT_FULL) {
         std::cout << "[ERROR] FAT is full!" << std::endl;
+      } else {
+        die("Error creating directory", result);
       }
     }
 };
@@ -93,9 +98,21 @@ class CreateCommand : public Command {
     }
 
     void run(FileSystem& fs) {
-      (void)fs;
-      debug("Will create file `" + opts[0] + "`");
-      // TODO: fs.createfile(opts[0], filesout);
+      try {
+        int result = fs.createfile(opts[0]);
+        if (result == RET_OK) {
+        } else if (result == RET_FAT_FULL) {
+          std::cout << "[ERROR] FAT is full!" << std::endl;
+        } else if (result == RET_DIR_ALREADY_EXISTS) {
+          std::cout << "[ERROR] Directory already exists!" << std::endl;
+        } else if (result == RET_NOT_INITIALIZED) {
+          std::cout << "[ERROR] Filesystem not loaded!" << std::endl;
+        } else {
+          die("Error creating file", result);
+        }
+      } catch(FSExcept &e) {
+        die("Error creating file: " + e.message, e.code);
+      }
     }
 };
 
@@ -110,9 +127,25 @@ class ListCommand : public Command {
     }
 
     void run(FileSystem& fs) {
-      (void)fs;
-      debug("Will list `" + opts[0] + "`");
-      // TODO: fs.listdir(opts[0], filesout);
+      std::vector<std::string> resp;
+      try {
+        int result = fs.listdir(opts[0], resp);
+        if (result == RET_OK) {
+          if (resp.size() == 0) {
+            std::cout << "=> Directory is empty" << std::endl;
+          } else {
+            for (unsigned int i=0; i<resp.size(); i++){
+              std::cout << "- " << resp[i] << std::endl;
+            }
+          }
+        } else if (result == RET_NOT_INITIALIZED) {
+          std::cout << "[ERROR] Filesystem not loaded!" << std::endl;
+        } else {
+          die("Error listing directory", result);
+        }
+      } catch(FSExcept &e) {
+        die("Error listing directory: " + e.message, e.code);
+      }
     }
 };
 
