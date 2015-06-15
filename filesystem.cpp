@@ -257,7 +257,7 @@ int FileSystem::write(const std::string &path, const std::string &content){
 
   dir_entry_t dir_cluster[32];
   unsigned short cluster_offset = 0;
-  const unsigned short new_fsize = content.size();
+  const unsigned int new_fsize = content.size();
   if (new_fsize == 0){
     return RET_OK; // we dont care
   }
@@ -273,13 +273,15 @@ int FileSystem::write(const std::string &path, const std::string &content){
   readblock(dir_cluster, cluster_offset);
 
   std::string target = utils_basename(path);
-  int rm_i = find_match_in_dir(target, dir_cluster);
-  if (rm_i == -1){
+  int wr_i = find_match_in_dir(target, dir_cluster);
+  if (wr_i == -1){
     std::string aux = "Could not follow path: ";
     aux += path;
     throw FSExcept(aux, RET_INTERNAL_ERROR);
   }
 
+  fmt_uint_into_uchar8quad(dir_cluster[wr_i].size, new_fsize);
+  // mvtodo: follow fat and lay file contents
   return RET_OK;
 }
 
