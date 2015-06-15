@@ -38,17 +38,8 @@ void FileSystem::debug(){
   }
 
   this->makedir("/home");
-  this->makedir("/home/box");
-  this->makedir("/home/box/bolo");
-  this->createfile("/home/box/torto.txt");
-  this->createfile("/home/box/cusco.txt");
-  this->write("/home/box/cusco.txt", str2k);
-  this->unlink("/home/box/torto.txt");
-  std::vector<std::string> resp;
-  this->listdir("/home/box", resp);
-  for (unsigned int i=0; i<resp.size(); i++){
-    std::cout << "ls: " << resp[i] << std::endl;
-  }
+  this->createfile("/home/bug.txt");
+  this->write("/home/bug.txt", str2k);
   int stop=1; // mvdebug
 
 }
@@ -488,6 +479,24 @@ void FileSystem::follow_fat_erase(const unsigned char *fb){
 }
 
 void FileSystem::lay_file_contents(const unsigned short fid_start, const std::string &content){
-  // mvtodo: keep laying content into datablocks and update fat accordingly, recursively
+
+  if (content.size() == 0){
+    return; // la la la
+  }
+
+  unsigned char buf[1024];
+  memset(buf, 0x00, sizeof(buf));
+
+  if (content.size() > 1024){
+    memcpy(buf, content.c_str(), sizeof(buf));
+    // mvtodo: update fat
+    // mvtodo: find free fat
+    //lay_file_contents(mvtodo, content.substr(1024, std::string::npos);
+  } else {
+    memcpy(buf, content.c_str(), content.size());
+  }
+
+  writeblock(buf, fid_start*1024);
+
 }
 
