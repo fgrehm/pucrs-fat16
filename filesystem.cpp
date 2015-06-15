@@ -31,7 +31,8 @@ void FileSystem::debug(){
   }
   this->makedir("/home");
   this->makedir("/home/box");
-  //this->makedir("/home/box/bolo");
+  this->makedir("/home/box/bolo");
+  int stop=1; // mvdebug
 
 }
 
@@ -111,7 +112,7 @@ int FileSystem::makedir(const std::string &path){
     f_idx = test_aux;
   }
 
-  fmt_ushort_into_uchar8pair(&(fat[f_idx]), 0xffff);
+  fmt_ushort_into_uchar8pair(&(fat[f_idx*2]), 0xffff);
   fmt_char8_into_uchar8(new_dir_struct.filename, new_dir_name.c_str());
   new_dir_struct.attributes = 1;
   fmt_ushort_into_uchar8pair(new_dir_struct.first_block, f_idx);
