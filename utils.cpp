@@ -22,6 +22,12 @@ void debug(const std::string& msg) {
 #endif
 }
 
+void die(const std::string& msg, int error_code) {
+  std::cout << msg << std::endl;
+  std::cout << "Error code: " << error_code << std::endl;
+  exit(error_code);
+}
+
 bool file_exists(const std::string& path) {
   struct stat fileStat;
   if (stat(path.c_str(), &fileStat)) {
@@ -110,7 +116,7 @@ std::string fmt_ascii7_to_stdstr(const unsigned char *cstr){
 }
 
 void fmt_char8_into_uchar8(unsigned char *dest, const char *orig){
-  strcpy((char*)dest, orig); 
+  strcpy((char*)dest, orig);
 }
 
 void fmt_ushort_into_uchar8pair(unsigned char *dest, const unsigned short orig){

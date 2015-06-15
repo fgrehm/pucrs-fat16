@@ -9,26 +9,7 @@ run() {
   return $?
 }
 
-T_001_recognizes_all_valid_commands() {
-  for cmd in init load ls mkdir create unlink write append read; do
-    # Not needed once init is only handled by the shell
-    rm -f $PARTITION_FILE
-    if run "${cmd}" | grep -q ': command not found$'; then
-      $T_fail "'${cmd}' was not recognized as a valid command"
-      return 1
-    fi
-  done
-}
-
-T_002_recognizes_invalid_commands() {
-  rm -f $PARTITION_FILE
-  if ! run "WAT" | grep -q ': command not found$'; then
-    $T_fail "'WAT' was recognized as a valid command"
-    return 1
-  fi
-}
-
-T_003_init_creates_partition_file() {
+T_001_init_creates_partition_file() {
   rm -f $PARTITION_FILE
 
   if ! run "init" > /dev/null; then
@@ -37,6 +18,26 @@ T_003_init_creates_partition_file() {
   fi
 
   [[ -f $PARTITION_FILE ]] || $T_fail "Partition not created"
+}
+
+T_002_recognizes_all_valid_commands() {
+  for cmd in load ls mkdir create unlink write append read; do
+    # Not needed once init is only handled by the shell
+    rm -f $PARTITION_FILE
+    run "init" > /dev/null
+    if run "${cmd}" | grep -q ': command not found$'; then
+      $T_fail "'${cmd}' was not recognized as a valid command"
+      return 1
+    fi
+  done
+}
+
+T_003_recognizes_invalid_commands() {
+  rm -f $PARTITION_FILE
+  if ! run "WAT" | grep -q ': command not found$'; then
+    $T_fail "'WAT' was recognized as a valid command"
+    return 1
+  fi
 }
 
 T_005_init_recreates_partition_file() {
@@ -63,7 +64,7 @@ T_005_init_recreates_partition_file() {
   [ $fs_size = '4194304' ] || $T_fail "Partition did not get wiped out"
 }
 
-T_006_mkdir_creates_a_dir() {
+T_006_mkdir_validates_its_arguments() {
   rm -f $PARTITION_FILE
 
   if ! run "init" > /dev/null; then
@@ -76,14 +77,13 @@ T_006_mkdir_creates_a_dir() {
     return 1
   fi
 
-  # TODO: Write more specs for success behavior
   if run "mkdir /foo/bar" | grep -q '^$ USAGE: `mkdir '; then
     $T_fail "Did not recognize the parameter provided"
     return 1
   fi
 }
 
-T_007_ls_lists_dir_contents() {
+T_007_ls_validates_its_arguments() {
   rm -f $PARTITION_FILE
 
   if ! run "init" > /dev/null; then
@@ -96,14 +96,13 @@ T_007_ls_lists_dir_contents() {
     return 1
   fi
 
-  # TODO: Write more specs for success behavior
   if run "ls /foo/bar" | grep -q '^$ USAGE: `ls '; then
     $T_fail "Did not recognize the parameter provided"
     return 1
   fi
 }
 
-T_008_create_touches_a_file_on_fs() {
+T_008_create_validates_its_arguments() {
   rm -f $PARTITION_FILE
 
   if ! run "init" > /dev/null; then
@@ -116,14 +115,13 @@ T_008_create_touches_a_file_on_fs() {
     return 1
   fi
 
-  # TODO: Write more specs for success behavior
   if run "create /foo/bar" | grep -q '^$ USAGE: `create '; then
     $T_fail "Did not recognize the parameter provided"
     return 1
   fi
 }
 
-T_009_unlink_removes_file_from_fs() {
+T_009_unlink_validates_its_arguments() {
   rm -f $PARTITION_FILE
 
   if ! run "init" > /dev/null; then
@@ -136,14 +134,13 @@ T_009_unlink_removes_file_from_fs() {
     return 1
   fi
 
-  # TODO: Write more specs for success behavior
   if run "unlink /foo/bar" | grep -q '^$ USAGE: `unlink '; then
     $T_fail "Did not recognize the parameter provided"
     return 1
   fi
 }
 
-T_010_write_writes_string_to_fs() {
+T_010_write_validates_its_arguments() {
   rm -f $PARTITION_FILE
 
   if ! run "init" > /dev/null; then
@@ -161,14 +158,13 @@ T_010_write_writes_string_to_fs() {
     return 1
   fi
 
-  # TODO: Write more specs for success behavior
   if run "write \"some-text\" /foo/bar" | grep -q '^$ USAGE: `write '; then
     $T_fail "Did not recognize the parameters provided"
     return 1
   fi
 }
 
-T_010_append_appends_string_to_fs() {
+T_010_append_validates_its_arguments() {
   rm -f $PARTITION_FILE
 
   if ! run "init" > /dev/null; then
@@ -186,14 +182,13 @@ T_010_append_appends_string_to_fs() {
     return 1
   fi
 
-  # TODO: append more specs for success behavior
   if run "append \"some-text\" /foo/bar" | grep -q '^$ USAGE: `append '; then
     $T_fail "Did not recognize the parameters provided"
     return 1
   fi
 }
 
-T_010_read_reads_file_from_fs() {
+T_010_read_validates_its_arguments() {
   rm -f $PARTITION_FILE
 
   if ! run "init" > /dev/null; then
@@ -206,7 +201,6 @@ T_010_read_reads_file_from_fs() {
     return 1
   fi
 
-  # TODO: read more specs for success behavior
   if run "read /foo/bar" | grep -q '^$ USAGE: `read '; then
     $T_fail "Did not recognize the parameters provided"
     return 1

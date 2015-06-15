@@ -34,9 +34,13 @@ class InitCommand : public Command {
     InitCommand(const std::string &n, const std::string& o) : Command(n, o) {}
 
     void run(FileSystem& fs) {
-      std::cout << "=> Formating partition..." << std::endl;
-      fs.init();
-      std::cout << "=> DONE" << std::endl;
+      std::cout << "=> Initializing file system...";
+      int result = fs.init();
+      if (result != RET_OK){
+        die("Error initializing file system", result);
+      } else {
+        std::cout << " DONE!" << std::endl;
+      }
     }
 };
 
@@ -45,9 +49,13 @@ class LoadCommand : public Command {
     LoadCommand(const std::string &n, const std::string& o) : Command(n, o) {}
 
     void run(FileSystem& fs) {
-      std::cout << "=> Loading partition table..." << std::endl;
-      fs.load();
-      std::cout << "=> DONE" << std::endl;
+      std::cout << "=> Loading filesystem...";
+      int result = fs.load();
+      if (result != RET_OK){
+        die("Error loading file system", result);
+      } else {
+        std::cout << " DONE!" << std::endl;
+      }
     }
 };
 
@@ -63,8 +71,14 @@ class MakeDirCommand : public Command {
 
     void run(FileSystem& fs) {
       (void)fs;
-      debug("Will create dir `" + opts[0] + "`");
-      // TODO: fs.mkdir(opts[0]);
+      int result = fs.makedir(opts[0]);
+      if (result == RET_OK) {
+        std::cout << "=> Directory created." << std::endl;
+      } else if (result == RET_DIR_ALREADY_EXISTS) {
+        std::cout << "[ERROR] Directory already exists!" << std::endl;
+      } else if (result == RET_FAT_FULL) {
+        std::cout << "[ERROR] FAT is full!" << std::endl;
+      }
     }
 };
 
