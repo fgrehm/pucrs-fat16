@@ -32,7 +32,9 @@ void FileSystem::debug(){
   this->makedir("/home");
   this->makedir("/home/box");
   this->makedir("/home/box/bolo");
+  this->createfile("/home/box/torto.txt");
   this->createfile("/home/box/cusco.txt");
+  this->unlink("/home/box/torto.txt");
   std::vector<std::string> resp;
   this->listdir("/home/box", resp);
   for (unsigned int i=0; i<resp.size(); i++){
@@ -135,7 +137,6 @@ int FileSystem::makedir(const std::string &path){
 int FileSystem::listdir(const std::string &path, std::vector<std::string> &result){
   CHECK_INIT 
 
-  dir_entry_t new_dir_struct;
   dir_entry_t dir_cluster[32];
   unsigned short cluster_offset = 0;
 
@@ -211,9 +212,32 @@ int FileSystem::createfile(const std::string &path){
 
 int FileSystem::unlink(const std::string &path){
   CHECK_INIT 
-  (void)path;
+
+  dir_entry_t dir_cluster[32];
+  unsigned short cluster_offset = 0;
+
+  int cof_i = traverse_path(path, ROOTDIR_OFFSET);
+  if (cof_i == -1){
+      std::string aux = "Could not follow path: ";
+      aux += path;
+      throw FSExcept(aux, RET_INTERNAL_ERROR);
+  } else{
+    cluster_offset = cof_i;
+  }
+  readblock(dir_cluster, cluster_offset);
+
+  std::string target = utils_basename(path);
+  int rm_i = find_match_in_dir(target, dir_cluster);
+  if (rm_i == -1){
+    std::string aux = "Could not follow path: ";
+    aux += path;
+    throw FSExcept(aux, RET_INTERNAL_ERROR);
+  }
+
+  // follow fat entry and go dando baixa
+
   // mvtodo: pra unlinkar tem que apagar na fat E dar baixa no filename tambem! (zerar o primeiro byte do filename)
-  return -1;
+  return RET_OK;
 }
 
 int FileSystem::write(const std::string &path, const std::string &content){
