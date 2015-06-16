@@ -7,7 +7,7 @@ int main() {
   if (file == "")
     file = "./fat.part";
   FileSystem fs(file);
-  fs.debug();
+  //fs.debug();
 
   run_console(fs);
   return 0;

@@ -44,13 +44,12 @@ void FileSystem::debug(){
   }
   str2k += "llllllllllllaaaaaaaaaaaaa";
 
-
   this->init();
   this->load();
   this->makedir("/home");
   this->createfile("/home/bug.txt");
   this->write("/home/bug.txt", str2k);
-  this->read("/home/bug.txt", str_ret);
+  //this->read("/home/bug.txt", str_ret);
   std::cout << "read [" << str_ret << "]" << std::endl;
   int stop=1; // mvdebug
 
@@ -474,7 +473,7 @@ int FileSystem::find_free_in_dir(const dir_entry_t *dir) const{
 
 int FileSystem::find_free_fat() const {
   for (unsigned int i=0; i<sizeof(fat)/2; i+=2){
-    if (fat[i] == 0x00){
+    if (fat[i] == 0x00 && fat[i+1] == 0x00){
       return (i/2);
     }
   }
